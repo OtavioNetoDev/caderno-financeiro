@@ -72,3 +72,141 @@ Coleção central do sistema (RF01, RF05).
 | deletedAt | date | exclusão lógica |
 
 Índices sugeridos: `{ userId, date }`, `{ userId, categoryId, date }` e `{ userId, status }`.
+
+## cards
+
+| Campo | Tipo | Observação |
+| --- | --- | --- |
+| name | string | ex.: Cartão principal |
+| closingDay | number | dia do fechamento da fatura |
+| dueDay | number | dia do vencimento |
+| limit | number | centavos (opcional) |
+
+## card_invoices
+
+Uma fatura por cartão e mês (RF10, RF11, RN01).
+
+| Campo | Tipo | Observação |
+| --- | --- | --- |
+| cardId | ObjectId | referência a cards |
+| referenceMonth | string | formato AAAA-MM |
+| calculatedTotal | number | soma dos lançamentos vinculados |
+| billedTotal | number | valor informado pela fatura |
+| adjustment | number | diferença de conciliação (RN05) |
+| status | string | open, closed ou paid |
+
+## installments
+
+Parcelas de compras no cartão (RN03).
+
+| Campo | Tipo | Observação |
+| --- | --- | --- |
+| transactionId | ObjectId | compra de origem |
+| number | number | parcela atual |
+| total | number | total de parcelas |
+| amount | number | centavos |
+| invoiceId | ObjectId | fatura em que será cobrada |
+
+## investments
+
+| Campo | Tipo | Observação |
+| --- | --- | --- |
+| name | string | nome do ativo ou produto |
+| type | string | cdb, fii, fund, stock, reserve, other |
+| annualRate | number | taxa anual estimada, usada na projeção |
+| active | boolean | encerrado permanece no histórico |
+
+## investment_entries
+
+Movimentações de cada investimento (RF13, RN15 a RN17).
+
+| Campo | Tipo | Observação |
+| --- | --- | --- |
+| investmentId | ObjectId | referência a investments |
+| kind | string | contribution, redemption ou income |
+| amount | number | centavos |
+| quantity | number | cotas, quando existir |
+| date | date | data da movimentação |
+
+A projeção de 1 a 100 anos (RF15) **não é armazenada**: é calculada na hora a partir do valor aplicado, da taxa e do aporte mensal.
+
+## debts
+
+Dívidas a receber e a pagar (RF17, RN07).
+
+| Campo | Tipo | Observação |
+| --- | --- | --- |
+| personId | ObjectId | com quem é a dívida |
+| direction | string | receivable (a receber) ou payable (a pagar) |
+| originalAmount | number | centavos |
+| interestRate | number | opcional |
+| balance | number | saldo atual |
+| status | string | open ou settled |
+
+## debt_payments
+
+| Campo | Tipo | Observação |
+| --- | --- | --- |
+| debtId | ObjectId | referência a debts |
+| amount | number | centavos |
+| date | date | data do pagamento |
+| notes | string | observações |
+
+## reserves
+
+Cofrinhos com cota por período (RF24, RN13, RN14).
+
+| Campo | Tipo | Observação |
+| --- | --- | --- |
+| name | string | ex.: Lanche, Emergência |
+| categoryId | ObjectId | categoria vinculada |
+| periodAmount | number | cota por período, em centavos |
+| balance | number | saldo atual |
+
+## budgets
+
+| Campo | Tipo | Observação |
+| --- | --- | --- |
+| categoryId | ObjectId | categoria controlada |
+| month | string | AAAA-MM |
+| limitAmount | number | centavos (RF23) |
+
+## notes
+
+Bloco de notas e observações por mês (RF25).
+
+| Campo | Tipo | Observação |
+| --- | --- | --- |
+| month | string | AAAA-MM |
+| title | string | opcional |
+| content | string | texto livre |
+
+## import_batches
+
+Histórico de importações (RF03, RF03.3).
+
+| Campo | Tipo | Observação |
+| --- | --- | --- |
+| fileName | string | nome original |
+| format | string | txt, csv, xlsx, docx, pdf, ofx, image |
+| status | string | reviewing, confirmed ou undone |
+| totalRows | number | linhas lidas |
+| importedRows | number | linhas confirmadas |
+
+## category_rules
+
+Regras de categorização automática (RF08).
+
+| Campo | Tipo | Observação |
+| --- | --- | --- |
+| keyword | string | ex.: açaí |
+| categoryId | ObjectId | categoria sugerida |
+| priority | number | maior vence em caso de conflito |
+
+## Relações principais
+
+- `transactions` pertence a `accounts`, `categories` e, opcionalmente, a `people` e `card_invoices`.
+- `card_invoices` pertence a `cards` e agrupa `transactions` e `installments`.
+- `investment_entries` pertence a `investments`.
+- `debt_payments` pertence a `debts`, que pertence a `people`.
+- `transactions` pode apontar para `import_batches`, permitindo desfazer um lote inteiro.
