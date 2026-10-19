@@ -8,7 +8,7 @@ Sistema financeiro individual, utilizável também por outras pessoas, para uso 
 
 - **RF01:** Cadastrar receita, despesa, transferência e investimento (data, valor, descrição, categoria, forma de pagamento).
 - **RF02:** Entrada rápida em texto livre, como "lanche com raisa 17" ou "açaí 12", com sugestão de categoria.
-- **RF03:** Importar o .txt atual (`DIA: dd/mm/aaaa: ... ||| ...`) com tela de revisão antes de salvar.
+- **RF03:** Importar lançamentos de documentos (txt, csv, xlsx, docx, pdf, ofx e imagem), com tela de revisão antes de salvar (ver seção "Importador de documentos").
 - **RF04:** Editar, excluir e duplicar lançamentos.
 - **RF05:** Marcar o lançamento como "pendente" (gasto que ainda será cobrado) ou "confirmado".
 
@@ -66,3 +66,15 @@ Sistema financeiro individual, utilizável também por outras pessoas, para uso 
 - **RNF09 Portabilidade:** roda em Windows e Linux; instalável como PWA, funcionando offline com sincronização depois.
 - **RNF10 Internacionalização:** português (BR) primeiro, moeda configurável.
 - **RNF11 Documentação:** README, guia de instalação e documentação das regras de negócio.
+
+## Importador de documentos
+
+- **RF03.1:** Mapeamento de colunas para planilhas, com modelos salvos por origem (ex.: extrato de uma carteira digital).
+- **RF03.2:** Detecção de lançamentos duplicados (data, valor e descrição).
+- **RF03.3:** Histórico de importações, com opção de desfazer o lote inteiro.
+- **RF03.4:** Indicador de confiança por linha importada (principalmente em PDF e OCR).
+- **RNF12 Upload seguro:** validação de tipo e tamanho máximo, sem executar conteúdo do arquivo; arquivos importados não ficam no repositório.
+
+### Formatos suportados
+
+txt, csv, xlsx, docx, pdf (com texto), pdf escaneado e imagem (via OCR) e ofx.
