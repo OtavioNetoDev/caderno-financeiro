@@ -1,0 +1,29 @@
+{
+  "name": "caderno-financeiro",
+  "version": "1.0.0",
+  "description": "Sistema de controle financeiro pessoal",
+  "main": "src/server.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OtavioNetoDev/caderno-financeiro.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/OtavioNetoDev/caderno-financeiro/issues"
+  },
+  "homepage": "https://github.com/OtavioNetoDev/caderno-financeiro#readme",
+  "dependencies": {
+    "dotenv": "^18.0.8",
+    "express": "^5.3.0"
+  }
+}
