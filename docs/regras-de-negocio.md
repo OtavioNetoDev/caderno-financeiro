@@ -29,3 +29,14 @@ Nomes e valores usados como exemplo são fictícios.
 - **RN10:** A dívida é considerada quitada quando o saldo chega a zero e permanece no histórico.
 - **RN11:** Dívidas entre as mesmas pessoas em sentidos opostos podem ser compensadas (encontro de contas), com a compensação registrada.
 - **RN12:** Em rateios (ex.: assinatura compartilhada), o valor cobrado pode ser menor que o devido, e o desconto concedido deve ser registrado.
+
+## 3. Cofrinhos, investimentos e dinheiro de terceiros
+
+- **RN13:** Cofrinho (reserva) tem saldo próprio e valor reservado por período. Gastos da categoria vinculada saem do cofrinho.
+- **RN14:** Quando a cota de um cofrinho se esgota, o sistema alerta o usuário.
+- **RN15:** Aporte move dinheiro de uma conta para um investimento. Não é despesa, mas entra no cálculo do percentual investido no mês.
+- **RN16:** Resgate devolve o valor à conta. O rendimento (resgate menos valor aplicado) é receita de investimento.
+- **RN17:** Proventos (dividendos, juros) são receitas de investimento vinculadas ao ativo que as gerou.
+- **RN18:** Dinheiro de terceiros guardado ou emprestado não entra em receita nem em patrimônio. É registrado como valor de terceiros.
+- **RN19:** Gasto "com" uma pessoa significa que ambos consumiram. Gasto "de" uma pessoa significa que foi só para ela. Os dois contam como despesa do usuário e podem ser filtrados por pessoa.
+- **RN20:** Lucro do mês = receitas menos despesas. Percentual investido = aportes divididos pelas receitas.
