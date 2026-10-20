@@ -41,3 +41,15 @@ Valores monetários sempre em **centavos** (inteiros).
 
 Projeto desenvolvido por Otávio Neto para planejamento,
 revisão e geração de partes do código. Cada etapa é testada e adaptada por mim antes do commit.
+
+## Endpoints
+
+| Rota | Descrição |
+| --- | --- |
+| `GET /health` | Status do serviço e do banco |
+| `/categories` | CRUD de categorias |
+| `/accounts` | CRUD de contas e carteiras |
+| `/transactions` | CRUD de lançamentos, com filtros `type`, `status`, `categoryId`, `accountId`, `from`, `to`, `page` e `limit` |
+| `GET /transactions/summary?month=AAAA-MM` | Receitas, despesas, aportes, lucro e % investido do mês |
+
+Valores monetários sempre em **centavos** (inteiros).
