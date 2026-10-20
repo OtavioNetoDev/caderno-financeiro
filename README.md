@@ -58,3 +58,8 @@ Valores monetários sempre em **centavos** (inteiros).
 
 Projeto desenvolvido por Otávio Neto com auxílio do Claude (Anthropic) para planejamento,
 revisão e geração de partes do código. Cada etapa é testada e adaptada por mim antes do commit.
+
+## Como foi feito
+
+Projeto desenvolvido por Otávio Neto para planejamento,
+revisão e geração de partes do código. Cada etapa é testada e adaptada por mim antes do commit.
