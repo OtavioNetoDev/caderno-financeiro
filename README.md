@@ -36,3 +36,8 @@ A API fica em `http://localhost:3000` e a rota `GET /health` confirma que está 
 | `GET /transactions/summary?month=AAAA-MM` | Receitas, despesas, aportes, lucro e % investido do mês |
 
 Valores monetários sempre em **centavos** (inteiros).
+
+## Como foi feito
+
+Projeto desenvolvido por Otávio Neto para planejamento,
+revisão e geração de partes do código. Cada etapa é testada e adaptada por mim antes do commit.
