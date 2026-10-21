@@ -1,17 +1,41 @@
 (function () {
-  const { el, api } = window.CF;
+  const { el, api, session, renderAuth } = window.CF;
   const app = document.getElementById('app');
 
-  async function start() {
-    const status = el('p', { class: 'muted' }, 'Verificando a API...');
+  async function begin() {
+    const { user } = await api('/auth/me');
     app.replaceChildren(
-      el('div', { class: 'container' }, el('h1', {}, 'Caderno Financeiro'), status),
+      el(
+        'div',
+        { class: 'container' },
+        el('h1', {}, 'Olá, ' + user.name),
+        el(
+          'button',
+          {
+            class: 'btn',
+            type: 'button',
+            onclick: () => {
+              session.clear();
+              renderAuth(app, begin);
+            },
+          },
+          'Sair',
+        ),
+      ),
     );
+  }
+
+  async function start() {
+    if (!session.getToken()) {
+      renderAuth(app, begin);
+      return;
+    }
     try {
-      const health = await api('/health');
-      status.textContent = 'API ' + health.status + ' · banco ' + health.database;
+      await begin();
     } catch (err) {
-      status.textContent = 'Não foi possível falar com a API: ' + err.message;
+      app.replaceChildren(
+        el('div', { class: 'container' }, el('p', { class: 'error' }, err.message)),
+      );
     }
   }
 
