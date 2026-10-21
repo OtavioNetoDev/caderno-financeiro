@@ -61,3 +61,15 @@ e as rotas de cadastro e login têm limite de tentativas por IP.
 | `GET /transactions/summary?month=AAAA-MM` | sim | Receitas, despesas, aportes, lucro e % investido do mês |
 
 Valores monetários sempre em **centavos** (inteiros).
+
+## Interface web
+
+Com o servidor rodando, abra `http://localhost:3000`, crie sua conta e comece a lançar.
+
+- Receitas, despesas e investimentos com categoria, conta, data e status (confirmado ou pendente).
+- Resumo do mês: receitas, despesas, lucro, % investido e análise automática.
+- Despesas por categoria e navegação por mês.
+
+A interface (`public/`) é servida pelo próprio Express, então os mesmos dados ficam disponíveis em
+qualquer computador que apontar para o mesmo banco. Para usar em outro PC: `git clone`, `npm install`,
+criar o `.env` e liberar o IP no MongoDB Atlas.
