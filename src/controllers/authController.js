@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Account = require('../models/Account');
 const AppError = require('../utils/AppError');
 const pick = require('../utils/pick');
 const { validatePassword, hashPassword, verifyPassword } = require('../utils/password');
@@ -39,6 +40,7 @@ async function register(req, res) {
 
   // Cada usuário novo já começa com as categorias padrão.
   await ensureDefaultCategories(user._id);
+  await Account.create({ userId: user._id, name: 'Carteira', type: 'cash', initialBalance: 0 });
   res.status(201).json({ user, token: signToken(user._id) });
 }
 
