@@ -1,4 +1,6 @@
 const express = require('express');
+const helmet = require('helmet');
+const cors = require('cors');
 const healthRoutes = require('./routes/health');
 const authRoutes = require('./routes/auth');
 const categoryRoutes = require('./routes/categories');
@@ -9,7 +11,12 @@ const { notFound, errorHandler } = require('./middlewares/errorHandler');
 
 const app = express();
 
-app.use(express.json());
+// CORS fechado por padrão; libere origens com CORS_ORIGIN=http://localhost:5173,https://meu-site.com
+const allowedOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : false;
+
+app.use(helmet());
+app.use(cors({ origin: allowedOrigins }));
+app.use(express.json({ limit: '100kb' }));
 
 app.use('/health', healthRoutes);
 app.use('/auth', authRoutes);

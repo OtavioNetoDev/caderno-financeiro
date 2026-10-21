@@ -5,6 +5,12 @@ function notFound(req, res, next) {
 }
 
 function errorHandler(err, req, res, _next) {
+  if (err.type === 'entity.parse.failed') {
+    return res.status(400).json({ error: 'JSON inválido' });
+  }
+  if (err.type === 'entity.too.large') {
+    return res.status(413).json({ error: 'Corpo da requisição grande demais' });
+  }
   if (err.name === 'ValidationError') {
     const details = Object.values(err.errors).map((e) => e.message);
     return res.status(400).json({ error: 'Dados inválidos', details });
