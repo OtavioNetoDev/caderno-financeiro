@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const AppError = require('../utils/AppError');
 const pick = require('../utils/pick');
-const { validatePassword, hashPassword } = require('../utils/password');
+const { validatePassword, hashPassword, verifyPassword } = require('../utils/password');
 const { signToken } = require('../utils/token');
 const { ensureDefaultCategories } = require('../services/categoryService');
 
@@ -42,4 +42,23 @@ async function register(req, res) {
   res.status(201).json({ user, token: signToken(user._id) });
 }
 
-module.exports = { register };
+async function login(req, res) {
+  const { email, password } = pick(req.body, ['email', 'password']);
+  if (!isString(email) || !isString(password)) {
+    throw new AppError(400, 'E-mail e senha são obrigatórios');
+  }
+
+  const user = await User.findOne({
+    email: email.trim().toLowerCase(),
+    deletedAt: null,
+  }).select('+passwordHash');
+
+  const valid = await verifyPassword(password, user && user.passwordHash);
+  if (!user || !valid) {
+    // Mesma mensagem nos dois casos, para não revelar quais e-mails existem.
+    throw new AppError(401, 'E-mail ou senha inválidos');
+  }
+  res.json({ user, token: signToken(user._id) });
+}
+
+module.exports = { register, login };
