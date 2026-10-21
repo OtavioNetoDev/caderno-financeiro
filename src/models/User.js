@@ -18,6 +18,8 @@ const userSchema = new Schema(
     },
     // Guarda apenas o hash (bcrypt), nunca a senha. Fica fora das consultas por padrão.
     passwordHash: { type: String, required: [true, 'Hash da senha é obrigatório'], select: false },
+    resetTokenHash: { type: String, select: false, default: null },
+    resetTokenExpires: { type: Date, select: false, default: null },
     currency: { type: String, default: 'BRL' },
     timezone: { type: String, default: 'America/Bahia' },
     deletedAt: { type: Date, default: null },
@@ -28,6 +30,8 @@ const userSchema = new Schema(
 userSchema.set('toJSON', {
   transform: (doc, ret) => {
     delete ret.passwordHash;
+    delete ret.resetTokenHash;
+    delete ret.resetTokenExpires;
     return ret;
   },
 });
