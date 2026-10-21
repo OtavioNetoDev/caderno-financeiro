@@ -4,6 +4,7 @@ const Account = require('../models/Account');
 const Category = require('../models/Category');
 const AppError = require('../utils/AppError');
 const pick = require('../utils/pick');
+const normalizeTransaction = require('../utils/normalizeTransaction');
 
 const FIELDS = [
   'type',
@@ -15,6 +16,7 @@ const FIELDS = [
   'toAccountId',
   'status',
   'personId',
+  'personName',
   'shareMode',
   'paymentMethod',
   'notes',
@@ -81,7 +83,7 @@ async function getOne(req, res) {
 }
 
 async function create(req, res) {
-  const data = pick(req.body, FIELDS);
+  const data = normalizeTransaction(pick(req.body, FIELDS));
   await assertReferences(req.userId, data);
   const transaction = await Transaction.create({ ...data, userId: req.userId });
   res.status(201).json(transaction);
@@ -89,7 +91,7 @@ async function create(req, res) {
 
 async function update(req, res) {
   const transaction = await findOwned(req);
-  const data = pick(req.body, FIELDS);
+  const data = normalizeTransaction(pick(req.body, FIELDS));
   await assertReferences(req.userId, data);
   transaction.set(data);
   await transaction.save();
