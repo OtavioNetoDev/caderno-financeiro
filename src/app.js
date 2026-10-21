@@ -7,6 +7,7 @@ const authRoutes = require('./routes/auth');
 const categoryRoutes = require('./routes/categories');
 const accountRoutes = require('./routes/accounts');
 const transactionRoutes = require('./routes/transactions');
+const debtRoutes = require('./routes/debts');
 const authenticate = require('./middlewares/authenticate');
 const { notFound, errorHandler } = require('./middlewares/errorHandler');
 
@@ -35,6 +36,7 @@ app.use('/auth', authRoutes);
 app.use('/categories', authenticate, categoryRoutes);
 app.use('/accounts', authenticate, accountRoutes);
 app.use('/transactions', authenticate, transactionRoutes);
+app.use('/debts', authenticate, debtRoutes);
 
 // Interface web (arquivos estáticos).
 app.use(express.static(path.join(__dirname, '..', 'public')));
