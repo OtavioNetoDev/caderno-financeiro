@@ -12,7 +12,7 @@ function getSecret() {
 function signToken(userId, options = {}) {
   return jwt.sign({}, getSecret(), {
     subject: String(userId),
-    expiresIn: process.env.JWT_EXPIRES_IN || '7d',
+    expiresIn: process.env.JWT_EXPIRES_IN || '12h',
     algorithm: 'HS256',
     ...options,
   });

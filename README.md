@@ -21,7 +21,7 @@ Preencha o `.env` (ele nunca é versionado):
 | `PORT` | Porta da API (padrão 3000) |
 | `MONGODB_URI` | URI do MongoDB (por exemplo, do Atlas) |
 | `JWT_SECRET` | Segredo para assinar tokens, com 32 caracteres ou mais |
-| `JWT_EXPIRES_IN` | Validade do token (padrão `7d`) |
+| `JWT_EXPIRES_IN` | Validade do token (padrão `12h`) |
 | `CORS_ORIGIN` | Origens liberadas no CORS, separadas por vírgula (opcional) |
 | `AUTH_RATE_LIMIT` | Tentativas de login/cadastro por IP a cada 15 minutos (padrão 20) |
 

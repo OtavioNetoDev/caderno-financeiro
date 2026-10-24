@@ -1,28 +1,37 @@
 (function () {
   const CF = (window.CF = window.CF || {});
   const TOKEN_KEY = 'cf_token';
+  const FLASH_KEY = 'cf_flash';
 
+  function safe(action) {
+    try {
+      return action();
+    } catch {
+      return null;
+    }
+  }
+
+  // O token fica só na aba (sessionStorage): ao fechar o navegador é preciso entrar de novo.
   CF.session = {
     getToken() {
-      try {
-        return localStorage.getItem(TOKEN_KEY);
-      } catch {
-        return null;
-      }
+      safe(() => localStorage.removeItem(TOKEN_KEY)); // descarta o token da versão anterior
+      return safe(() => sessionStorage.getItem(TOKEN_KEY));
     },
     setToken(token) {
-      try {
-        localStorage.setItem(TOKEN_KEY, token);
-      } catch {
-        /* armazenamento indisponível */
-      }
+      safe(() => sessionStorage.setItem(TOKEN_KEY, token));
     },
     clear() {
-      try {
-        localStorage.removeItem(TOKEN_KEY);
-      } catch {
-        /* armazenamento indisponível */
-      }
+      safe(() => sessionStorage.removeItem(TOKEN_KEY));
+      safe(() => localStorage.removeItem(TOKEN_KEY));
+    },
+    // Mensagem exibida na tela de login após um logout automático.
+    setFlash(message) {
+      safe(() => sessionStorage.setItem(FLASH_KEY, message));
+    },
+    takeFlash() {
+      const message = safe(() => sessionStorage.getItem(FLASH_KEY)) || '';
+      safe(() => sessionStorage.removeItem(FLASH_KEY));
+      return message;
     },
   };
 
@@ -50,6 +59,7 @@
     if (!response.ok) {
       if (response.status === 401 && token) {
         CF.session.clear();
+        CF.session.setFlash('Sessão expirada. Entre novamente.');
         location.reload();
       }
       const error = new Error(data.error || 'Erro inesperado');

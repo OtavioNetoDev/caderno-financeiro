@@ -11,7 +11,7 @@
   window.CF.renderAuth = function renderAuth(container, onSuccess) {
     const resetMatch = location.hash.match(/^#reset=([a-f0-9]{64})$/);
     let mode = resetMatch ? 'reset' : 'login';
-    let notice = '';
+    let notice = window.CF.session.takeFlash();
 
     function draw() {
       const [heading, subtitle, label] = TEXT[mode];
