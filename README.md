@@ -76,7 +76,26 @@ Todos exigem `Authorization: Bearer <token>`, exceto `/health` e `/auth/*` (meno
 
 Valores monetários sempre em **centavos** (inteiros).
 
+## Importador de documentos
+
+Em **Importar**, escolha um arquivo, revise a prévia (editável) e só então confirme. Nada é salvo antes disso.
+
+| Formato | Como é lido |
+| --- | --- |
+| `.txt` | Anotações no formato `DIA: dd/mm/aaaa: texto ||| texto` (com seções `MÊS DE ...`) ou linhas de extrato |
+| `.csv` | Colunas Data, Descrição e Valor (valor negativo = despesa); separador `;`, `,` ou tabulação |
+| `.xlsx` | Primeira aba com dados, com as mesmas colunas |
+| `.docx` | Texto do documento, nos formatos acima |
+| `.pdf` | Texto selecionável (PDF escaneado ainda não é suportado) |
+
+- O sistema sugere tipo, categoria e pessoa ("com" / "de") a partir de palavras-chave. Linhas incertas (sem valor, vários valores, dívida, data fora do mês, duplicadas) vêm desmarcadas e destacadas.
+- Duplicados (mesmo dia, valor, tipo e descrição) são detectados, respeitando a quantidade existente.
+- Cada importação é um lote que pode ser **desfeito** (os lançamentos vão para a lixeira).
+- Arquivos de até 5 MB, conferidos pelo conteúdo e processados só em memória.
+
+Endpoints: `GET /imports/formats`, `POST /imports/preview` (multipart), `POST /imports/confirm`, `GET /imports` e `DELETE /imports/:id`.
+
 ## Roadmap
 
-Importador de documentos (txt, planilha, docx e pdf), restauração de backup pela tela,
-gastos de cartão por categoria no resumo mensal e encerramento de sessões após troca de senha.
+Leitura de PDF escaneado (OCR), restauração de backup pela tela, gastos de cartão por categoria
+no resumo mensal e encerramento de sessões após troca de senha.
