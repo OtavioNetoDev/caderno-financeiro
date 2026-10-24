@@ -545,3 +545,11 @@ textarea {
   border-radius: 8px;
   resize: vertical;
 }
+
+.progress.warn > div {
+  background: var(--gold);
+}
+
+.progress.over > div {
+  background: var(--expense);
+}
