@@ -11,6 +11,7 @@ const debtRoutes = require('./routes/debts');
 const investmentRoutes = require('./routes/investments');
 const noteRoutes = require('./routes/notes');
 const cardRoutes = require('./routes/cards');
+const budgetRoutes = require('./routes/budgets');
 const authenticate = require('./middlewares/authenticate');
 const { notFound, errorHandler } = require('./middlewares/errorHandler');
 
@@ -47,6 +48,8 @@ app.use('/notes', authenticate, noteRoutes);
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
 app.use('/cards', authenticate, cardRoutes);
+
+app.use('/budgets', authenticate, budgetRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
