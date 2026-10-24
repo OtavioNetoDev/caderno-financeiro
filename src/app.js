@@ -9,6 +9,7 @@ const accountRoutes = require('./routes/accounts');
 const transactionRoutes = require('./routes/transactions');
 const debtRoutes = require('./routes/debts');
 const investmentRoutes = require('./routes/investments');
+const noteRoutes = require('./routes/notes');
 const authenticate = require('./middlewares/authenticate');
 const { notFound, errorHandler } = require('./middlewares/errorHandler');
 
@@ -39,6 +40,7 @@ app.use('/accounts', authenticate, accountRoutes);
 app.use('/transactions', authenticate, transactionRoutes);
 app.use('/debts', authenticate, debtRoutes);
 app.use('/investments', authenticate, investmentRoutes);
+app.use('/notes', authenticate, noteRoutes);
 
 // Interface web (arquivos estáticos).
 app.use(express.static(path.join(__dirname, '..', 'public')));
