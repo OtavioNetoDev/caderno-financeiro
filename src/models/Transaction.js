@@ -37,6 +37,7 @@ const transactionSchema = new Schema(
     },
     personId: { type: Schema.Types.ObjectId, default: null },
     personName: { type: String, trim: true, maxlength: 60, default: '' },
+    importBatchId: { type: Schema.Types.ObjectId, default: null },
     shareMode: { type: String, enum: { values: ['with', 'for'], message: 'shareMode inválido' } },
     paymentMethod: {
       type: String,
