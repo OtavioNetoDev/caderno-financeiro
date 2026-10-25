@@ -2,6 +2,7 @@ const User = require('../models/User');
 const AppError = require('../utils/AppError');
 const asyncHandler = require('../utils/asyncHandler');
 const { verifyToken } = require('../utils/token');
+const { isSessionRevoked } = require('../utils/session');
 
 // Exige "Authorization: Bearer <token>" e carrega o usuário dono do token.
 const authenticate = asyncHandler(async (req, res, next) => {
@@ -10,10 +11,15 @@ const authenticate = asyncHandler(async (req, res, next) => {
     throw new AppError(401, 'Autenticação necessária');
   }
 
-  const { userId } = verifyToken(token);
+  const { userId, issuedAt } = verifyToken(token);
   const user = await User.findOne({ _id: userId, deletedAt: null });
   if (!user) {
     throw new AppError(401, 'Usuário não encontrado');
+  }
+
+  // Trocar a senha encerra as sessões emitidas antes da troca.
+  if (isSessionRevoked(user.passwordChangedAt, issuedAt)) {
+    throw new AppError(401, 'Sessão encerrada. Entre novamente.');
   }
 
   req.user = user;

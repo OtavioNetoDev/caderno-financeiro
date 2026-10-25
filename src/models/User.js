@@ -20,6 +20,7 @@ const userSchema = new Schema(
     passwordHash: { type: String, required: [true, 'Hash da senha é obrigatório'], select: false },
     resetTokenHash: { type: String, select: false, default: null },
     resetTokenExpires: { type: Date, select: false, default: null },
+    passwordChangedAt: { type: Date, default: null },
     currency: { type: String, default: 'BRL' },
     timezone: { type: String, default: 'America/Bahia' },
     deletedAt: { type: Date, default: null },

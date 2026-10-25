@@ -22,7 +22,7 @@ function verifyToken(token) {
   const secret = getSecret();
   try {
     const payload = jwt.verify(token, secret, { algorithms: ['HS256'] });
-    return { userId: payload.sub };
+    return { userId: payload.sub, issuedAt: payload.iat };
   } catch {
     throw new AppError(401, 'Token inválido ou expirado');
   }

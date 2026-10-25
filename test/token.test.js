@@ -8,7 +8,9 @@ const { signToken, verifyToken } = require('../src/utils/token');
 const USER_ID = '64b7f0c2a1b2c3d4e5f60718';
 
 test('gera e valida um token, devolvendo o id do usuário', () => {
-  assert.deepStrictEqual(verifyToken(signToken(USER_ID)), { userId: USER_ID });
+  const result = verifyToken(signToken(USER_ID));
+  assert.strictEqual(result.userId, USER_ID);
+  assert.ok(Number.isInteger(result.issuedAt));
 });
 
 test('rejeita token adulterado', () => {

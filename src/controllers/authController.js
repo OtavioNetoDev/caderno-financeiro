@@ -109,7 +109,7 @@ async function resetPassword(req, res) {
   const result = await User.updateOne(
     { resetTokenHash: sha256(token), resetTokenExpires: { $gt: new Date() }, deletedAt: null },
     {
-      $set: { passwordHash: await hashPassword(password) },
+      $set: { passwordHash: await hashPassword(password), passwordChangedAt: new Date() },
       $unset: { resetTokenHash: '', resetTokenExpires: '' },
     },
   );
