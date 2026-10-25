@@ -40,3 +40,27 @@ Nomes e valores usados como exemplo são fictícios.
 - **RN18:** Dinheiro de terceiros guardado ou emprestado não entra em receita nem em patrimônio. É registrado como valor de terceiros.
 - **RN19:** Gasto "com" uma pessoa significa que ambos consumiram. Gasto "de" uma pessoa significa que foi só para ela. Os dois contam como despesa do usuário e podem ser filtrados por pessoa.
 - **RN20:** Lucro do mês = receitas menos despesas. Percentual investido = aportes divididos pelas receitas.
+
+## 4. Faturas e parcelas (implementação)
+
+- **RN21:** A compra entra na fatura do mês em que ela fecha: comprada até o dia do fechamento, vai para a fatura do mês; depois dele, para a do mês seguinte.
+- **RN22:** Compras parceladas dividem o valor em centavos (as primeiras parcelas recebem o centavo que sobra) e cada parcela cai em uma fatura diferente.
+- **RN23:** O vencimento fica no mesmo mês da fatura se o dia de vencimento for maior que o de fechamento; senão, no mês seguinte.
+- **RN24:** O valor informado pelo banco pode diferir do calculado. A diferença é exibida, sem alterar as compras.
+- **RN25:** Pagar a fatura cria uma despesa única na conta escolhida e marca a fatura como paga (uma vez só).
+
+## 5. Metas por categoria
+
+- **RN26:** Cada categoria de despesa pode ter uma meta mensal em centavos.
+- **RN27:** Contam só despesas confirmadas e com categoria. Até 79% é "dentro da meta", de 80% a 99% é "atenção" e a partir de 100% a meta está estourada.
+
+## 6. Investimentos e rendimento estimado
+
+- **RN28:** Saldo aplicado = aportes menos resgates, nunca negativo. Resgatar mais do que foi aplicado gera ganho recebido.
+- **RN29:** Total recebido = proventos mais os ganhos dos resgates.
+- **RN30:** O rendimento diário, semanal e mensal usa taxas equivalentes de juros compostos a partir da taxa anual (365 dias por ano). A projeção de 1 a 100 anos aplica juros mensais e aportes ao fim de cada mês, sem impostos nem inflação.
+
+## 7. Sessão e senha
+
+- **RN31:** O token de acesso vale 12 horas, fica só na aba do navegador e é encerrado após 15 minutos sem uso na interface.
+- **RN32:** Trocar a senha pela recuperação encerra as sessões emitidas antes da troca.
