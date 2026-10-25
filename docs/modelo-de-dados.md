@@ -210,3 +210,17 @@ Regras de categorização automática (RF08).
 - `investment_entries` pertence a `investments`.
 - `debt_payments` pertence a `debts`, que pertence a `people`.
 - `transactions` pode apontar para `import_batches`, permitindo desfazer um lote inteiro.
+
+## Implementação atual
+
+Diferenças entre o desenho acima e o que foi implementado:
+
+- **Dívidas e investimentos:** as movimentações ficam dentro do próprio documento (`entries`), e não em coleções separadas. A dívida guarda pagamentos e aumentos; o investimento guarda aportes, resgates e proventos. O saldo é recalculado a cada movimentação.
+- **Lançamentos:** `personName` (texto) é usado no lugar de `personId`, junto com `shareMode` ("com" ou "de").
+- **Cartões:** `cards` guarda o dia de fechamento e vencimento, além das faturas conferidas (`invoices`: valor informado pelo banco, pago, valor pago). As compras ficam em `cardcharges` (com `installments`). A fatura de cada mês e as parcelas são calculadas a partir das compras e do dia de fechamento, sem coleção própria.
+- **Metas:** `budgets`, com uma meta mensal por categoria e usuário.
+- **Notas:** `notes`, por mês.
+- **Usuários:** além de nome, e-mail e hash da senha, guardam o hash do código de recuperação (`resetTokenHash`, `resetTokenExpires`) e `passwordChangedAt`, usado para encerrar sessões antigas.
+- **Ainda não implementados:** `reserves` (cofrinhos com cota própria), `category_rules` (regras de categorização automática) e `import_batches` (importador de documentos).
+
+Todos os valores monetários continuam em centavos (inteiros) e todos os documentos têm `userId`.
