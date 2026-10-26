@@ -11,6 +11,13 @@ function errorHandler(err, req, res, _next) {
   if (err.type === 'entity.too.large') {
     return res.status(413).json({ error: 'Corpo da requisição grande demais' });
   }
+  if (err.name === 'MulterError') {
+    const message =
+      err.code === 'LIMIT_FILE_SIZE'
+        ? 'Arquivo grande demais (máximo de 5 MB)'
+        : 'Falha no envio do arquivo';
+    return res.status(400).json({ error: message });
+  }
   if (err.name === 'ValidationError') {
     const details = Object.values(err.errors).map((e) => e.message);
     return res.status(400).json({ error: 'Dados inválidos', details });
