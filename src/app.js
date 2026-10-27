@@ -34,7 +34,7 @@ app.use(
   }),
 );
 app.use(cors({ origin: allowedOrigins }));
-app.use(express.json({ limit: '100kb' }));
+app.use(express.json({ limit: '1mb' }));
 
 app.use('/health', healthRoutes);
 app.use('/auth', authRoutes);
