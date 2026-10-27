@@ -8,6 +8,7 @@
     user: null,
     month: money.currentMonth(),
     accounts: [],
+    balances: null,
     categories: [],
     transactions: [],
     summary: null,
@@ -45,13 +46,20 @@
   async function load() {
     const { from, to } = money.monthRange(state.month);
     const query = '?limit=200&from=' + encodeURIComponent(from) + '&to=' + encodeURIComponent(to);
-    const [accounts, categories, transactions, summary] = await Promise.all([
+    const [accounts, balances, categories, transactions, summary] = await Promise.all([
       api('/accounts'),
+      api('/accounts/balances'),
       api('/categories'),
       api('/transactions' + query),
       api('/transactions/summary?month=' + state.month),
     ]);
-    Object.assign(state, { accounts, categories, transactions: transactions.items, summary });
+    Object.assign(state, {
+      accounts,
+      balances,
+      categories,
+      transactions: transactions.items,
+      summary,
+    });
   }
 
   function logout() {
