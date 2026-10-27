@@ -553,3 +553,26 @@ textarea {
 .progress.over > div {
   background: var(--expense);
 }
+
+.row-warn {
+  background: color-mix(in srgb, var(--gold) 14%, transparent);
+}
+
+.table-wrap td input,
+.table-wrap td select {
+  padding: 0.35rem 0.45rem;
+  font-size: 0.85rem;
+}
+
+.col-desc {
+  min-width: 220px;
+}
+
+.col-money {
+  min-width: 90px;
+  text-align: right;
+}
+
+.col-cat {
+  min-width: 150px;
+}
