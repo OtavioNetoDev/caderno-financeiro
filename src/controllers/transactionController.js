@@ -5,6 +5,7 @@ const Category = require('../models/Category');
 const AppError = require('../utils/AppError');
 const pick = require('../utils/pick');
 const normalizeTransaction = require('../utils/normalizeTransaction');
+const { loadCardSpending } = require('../services/cardSpendingQueries');
 
 const FIELDS = [
   'type',
@@ -116,25 +117,39 @@ async function summary(req, res) {
   const start = new Date(Date.UTC(year, mon - 1, 1, 3));
   const end = new Date(Date.UTC(year, mon, 1, 3));
 
-  const rows = await Transaction.aggregate([
-    {
-      $match: {
-        userId: new mongoose.Types.ObjectId(req.userId),
-        deletedAt: null,
-        status: 'confirmed',
-        date: { $gte: start, $lt: end },
+  // O pagamento da fatura fica de fora: as compras do cartão entram pelo mês da fatura.
+  const [rows, card] = await Promise.all([
+    Transaction.aggregate([
+      {
+        $match: {
+          userId: new mongoose.Types.ObjectId(req.userId),
+          deletedAt: null,
+          status: 'confirmed',
+          invoicePayment: { $ne: true },
+          date: { $gte: start, $lt: end },
+        },
       },
-    },
-    { $group: { _id: '$type', total: { $sum: '$amount' } } },
+      { $group: { _id: '$type', total: { $sum: '$amount' } } },
+    ]),
+    loadCardSpending(req.userId, month),
   ]);
 
   const totals = Object.fromEntries(rows.map((row) => [row._id, row.total]));
   const income = totals.income || 0;
-  const expense = totals.expense || 0;
+  const expense = (totals.expense || 0) + card.total;
   const investment = totals.investment || 0;
   const investedPercent = income > 0 ? Math.round((investment / income) * 10000) / 100 : 0;
 
-  res.json({ month, income, expense, investment, profit: income - expense, investedPercent });
+  res.json({
+    month,
+    income,
+    expense,
+    cardExpense: card.total,
+    cardByCategory: card.byCategory,
+    investment,
+    profit: income - expense,
+    investedPercent,
+  });
 }
 
 module.exports = { list, getOne, create, update, remove, summary };
