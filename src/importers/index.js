@@ -3,6 +3,7 @@ const AppError = require('../utils/AppError');
 const { parseText } = require('./textParser');
 const { parseCsv, rowsFromTable } = require('./table');
 const { parseXlsx } = require('./xlsx');
+const { parseDocx, parsePdf } = require('./documents');
 
 function decodeText(buffer) {
   if (buffer.includes(0)) {
@@ -37,6 +38,8 @@ const IMPORTERS = {
     parse: async (buffer, options) => rowsFromTable(parseCsv(decodeText(buffer)), options),
   },
   xlsx: { extensions: ['.xlsx'], parse: parseXlsx },
+  docx: { extensions: ['.docx'], parse: parseDocx },
+  pdf: { extensions: ['.pdf'], parse: parsePdf },
 };
 
 const EXTENSIONS = Object.fromEntries(
