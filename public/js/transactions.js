@@ -1,6 +1,11 @@
 (function () {
   const { el, api, money } = window.CF;
-  const TYPE_LABEL = { expense: 'Despesa', income: 'Receita', investment: 'Investimento' };
+  const TYPE_LABEL = {
+    expense: 'Despesa',
+    income: 'Receita',
+    investment: 'Investimento',
+    transfer: 'Transferência',
+  };
   const SIGN = { income: '+ ', expense: '− ', investment: '' };
   const dayOf = (iso) => new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/Bahia' });
   let editingId = null;
@@ -38,6 +43,14 @@
       ...state.accounts.map((item) => el('option', { value: item._id }, item.name)),
     );
     account.value = start.accountId || (state.accounts[0] ? state.accounts[0]._id : '');
+    const toAccount = el(
+      'select',
+      {},
+      ...state.accounts.map((item) => el('option', { value: item._id }, item.name)),
+    );
+    const otherAccount = state.accounts.find((item) => item._id !== account.value);
+    toAccount.value = start.toAccountId || (otherAccount ? otherAccount._id : '');
+    const toBox = el('div', {}, el('span', { class: 'muted' }, 'Conta de destino'), toAccount);
     const date = el('input', {
       type: 'date',
       value: current ? dayOf(current.date) : money.todayISO(),
@@ -57,10 +70,15 @@
       maxlength: 60,
       value: start.personName || null,
     });
-    person.hidden = !share.value;
-    share.addEventListener('change', () => {
-      person.hidden = !share.value;
-    });
+    // Transferência não tem categoria nem pessoa; mostra a conta de destino.
+    function syncVisibility() {
+      const isTransfer = type.value === 'transfer';
+      category.hidden = isTransfer;
+      share.hidden = isTransfer;
+      person.hidden = isTransfer || !share.value;
+      toBox.hidden = !isTransfer;
+    }
+    share.addEventListener('change', syncVisibility);
     const notes = el('textarea', {
       placeholder: 'Observações (opcional)',
       maxlength: 1000,
@@ -77,8 +95,12 @@
       category.replaceChildren(el('option', { value: '' }, 'Sem categoria'), ...options);
       category.value = selected || '';
     }
-    type.addEventListener('change', () => fillCategories());
+    type.addEventListener('change', () => {
+      fillCategories();
+      syncVisibility();
+    });
     fillCategories(start.categoryId);
+    syncVisibility();
 
     const form = el(
       'form',
@@ -87,13 +109,19 @@
         onsubmit: async (event) => {
           event.preventDefault();
           error.hidden = true;
+          const isTransfer = type.value === 'transfer';
           const cents = money.parseMoney(amount.value);
           if (!cents) {
             error.textContent = 'Informe um valor válido, como 12,50';
             error.hidden = false;
             return;
           }
-          if (share.value && !person.value.trim()) {
+          if (isTransfer && (!toAccount.value || toAccount.value === account.value)) {
+            error.textContent = 'Escolha uma conta de destino diferente da origem';
+            error.hidden = false;
+            return;
+          }
+          if (!isTransfer && share.value && !person.value.trim()) {
             error.textContent = 'Informe o nome da pessoa';
             error.hidden = false;
             return;
@@ -106,11 +134,12 @@
                 amount: cents,
                 date: money.toApiDate(date.value),
                 description: description.value,
-                categoryId: category.value,
+                categoryId: isTransfer ? '' : category.value,
                 accountId: account.value,
+                toAccountId: isTransfer ? toAccount.value : null,
                 status: pending.checked ? 'pending' : 'confirmed',
-                shareMode: share.value,
-                personName: share.value ? person.value : '',
+                shareMode: isTransfer ? '' : share.value,
+                personName: !isTransfer && share.value ? person.value : '',
                 notes: notes.value.trim(),
               },
             });
@@ -128,6 +157,7 @@
       description,
       category,
       account,
+      toBox,
       date,
       share,
       person,
