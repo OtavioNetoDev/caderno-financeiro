@@ -177,6 +177,7 @@ async function payInvoice(req, res) {
     accountId,
     status: 'confirmed',
     paymentMethod: 'transfer',
+    invoicePayment: true,
   });
   const record = invoiceRecord(card, month);
   record.paid = true;

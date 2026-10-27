@@ -44,6 +44,9 @@ const transactionSchema = new Schema(
       enum: { values: ['cash', 'pix', 'card', 'transfer'], message: 'Forma de pagamento inválida' },
     },
     notes: { type: String, trim: true, maxlength: 1000, default: '' },
+    // Pagamento de fatura de cartão: sai da conta, mas não conta como despesa do mês,
+    // porque as compras da fatura já entram por categoria. Só o servidor define este campo.
+    invoicePayment: { type: Boolean, default: false },
     deletedAt: { type: Date, default: null },
   },
   { timestamps: true },
