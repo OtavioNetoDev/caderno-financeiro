@@ -218,6 +218,7 @@
           ),
           item.notes && el('span', { class: 'muted' }, item.notes),
           item.status === 'pending' && el('span', { class: 'badge' }, 'pendente'),
+          item.invoicePayment && el('span', { class: 'badge' }, 'pagamento de fatura'),
         ),
         el(
           'span',

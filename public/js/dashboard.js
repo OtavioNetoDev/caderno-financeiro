@@ -32,7 +32,8 @@
     const byCategory = new Map();
     let pending = 0;
     for (const item of state.transactions) {
-      if (item.type !== 'expense') {
+      // Pagamento de fatura não é gasto: as compras do cartão entram por categoria.
+      if (item.type !== 'expense' || item.invoicePayment) {
         continue;
       }
       if (item.status === 'pending') {
@@ -41,6 +42,11 @@
       }
       const name = categoryNames.get(item.categoryId) || 'Sem categoria';
       byCategory.set(name, (byCategory.get(name) || 0) + item.amount);
+    }
+    // Compras do cartão, pelo mês da fatura.
+    for (const item of summary.cardByCategory || []) {
+      const name = categoryNames.get(item.categoryId) || 'Sem categoria';
+      byCategory.set(name, (byCategory.get(name) || 0) + item.total);
     }
     const ranking = [...byCategory.entries()].sort((a, b) => b[1] - a[1]);
     const max = ranking.length ? ranking[0][1] : 1;
@@ -79,6 +85,7 @@
           ),
           stat('Investido', money.formatMoney(summary.investment), 'investment'),
           stat('% investido', summary.investedPercent.toLocaleString('pt-BR') + '%', ''),
+          stat('No cartão (fatura do mês)', money.formatMoney(summary.cardExpense || 0), 'expense'),
           stat('Pendente (despesas)', money.formatMoney(pending), ''),
         ),
         el('p', { class: 'muted' }, analysis(summary)),
