@@ -14,6 +14,32 @@
     node.hidden = false;
   }
 
+  // Patrimônio total e, quando há lançamentos pendentes, o saldo previsto.
+  function totalStat(balances) {
+    if (!balances) {
+      return el('div');
+    }
+    const stats = [
+      el(
+        'div',
+        { class: 'stat' },
+        el('span', { class: 'muted' }, 'Patrimônio total'),
+        el('strong', {}, money.formatMoney(balances.netWorth)),
+      ),
+    ];
+    if (balances.pending !== 0) {
+      stats.push(
+        el(
+          'div',
+          { class: 'stat' },
+          el('span', { class: 'muted' }, 'Previsto com pendentes'),
+          el('strong', {}, money.formatMoney(balances.projected)),
+        ),
+      );
+    }
+    return el('div', { class: 'stats' }, ...stats);
+  }
+
   function accountsCard(state, refresh) {
     const name = el('input', {
       type: 'text',
@@ -64,6 +90,9 @@
       error,
     );
 
+    const balanceById = new Map(
+      ((state.balances && state.balances.items) || []).map((item) => [item.accountId, item]),
+    );
     const rows = state.accounts.map((account) =>
       el(
         'tr',
@@ -71,6 +100,15 @@
         el('td', {}, account.name),
         el('td', {}, ACCOUNT_TYPES[account.type] || account.type),
         el('td', { class: 'num' }, money.formatMoney(account.initialBalance)),
+        el(
+          'td',
+          { class: 'num' },
+          money.formatMoney(
+            balanceById.has(account._id)
+              ? balanceById.get(account._id).balance
+              : account.initialBalance,
+          ),
+        ),
         el(
           'td',
           { class: 'num' },
@@ -121,6 +159,7 @@
       'section',
       { class: 'card' },
       el('h2', {}, 'Contas e carteiras'),
+      totalStat(state.balances),
       form,
       el(
         'div',
@@ -137,6 +176,7 @@
               el('th', {}, 'Nome'),
               el('th', {}, 'Tipo'),
               el('th', { class: 'num' }, 'Saldo inicial'),
+              el('th', { class: 'num' }, 'Saldo atual'),
               el('th', {}),
             ),
           ),
