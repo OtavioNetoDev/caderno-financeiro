@@ -208,7 +208,9 @@
             [
               money.formatDate(item.date),
               categoryNames.get(item.categoryId),
-              accountNames.get(item.accountId),
+              item.type === 'transfer' && item.toAccountId
+                ? accountNames.get(item.accountId) + ' → ' + accountNames.get(item.toAccountId)
+                : accountNames.get(item.accountId),
               item.personName && (item.shareMode === 'for' ? 'de ' : 'com ') + item.personName,
             ]
               .filter(Boolean)
