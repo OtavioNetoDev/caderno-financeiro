@@ -61,6 +61,12 @@
     share.addEventListener('change', () => {
       person.hidden = !share.value;
     });
+    const notes = el('textarea', {
+      placeholder: 'Observações (opcional)',
+      maxlength: 1000,
+      rows: 2,
+    });
+    notes.value = start.notes || '';
     const pending = el('input', { type: 'checkbox', checked: start.status === 'pending' });
     const error = el('p', { class: 'error', role: 'alert', hidden: true });
 
@@ -105,6 +111,7 @@
                 status: pending.checked ? 'pending' : 'confirmed',
                 shareMode: share.value,
                 personName: share.value ? person.value : '',
+                notes: notes.value.trim(),
               },
             });
             editingId = null;
@@ -124,6 +131,7 @@
       date,
       share,
       person,
+      notes,
       el('label', { class: 'check' }, pending, 'Pendente (ainda não pago)'),
       el(
         'button',
@@ -176,6 +184,7 @@
               .filter(Boolean)
               .join(' · '),
           ),
+          item.notes && el('span', { class: 'muted' }, item.notes),
           item.status === 'pending' && el('span', { class: 'badge' }, 'pendente'),
         ),
         el(
