@@ -4,6 +4,7 @@ const Category = require('../models/Category');
 const Transaction = require('../models/Transaction');
 const AppError = require('../utils/AppError');
 const { statusOf } = require('../services/budgetService');
+const { loadCardSpending } = require('../services/cardSpendingQueries');
 
 async function status(req, res) {
   const { month } = req.query;
@@ -16,7 +17,7 @@ async function status(req, res) {
   const end = new Date(Date.UTC(year, mon, 1, 3));
   const userId = new mongoose.Types.ObjectId(req.userId);
 
-  const [budgets, spentRows] = await Promise.all([
+  const [budgets, spentRows, card] = await Promise.all([
     Budget.find({ userId }),
     Transaction.aggregate([
       {
@@ -25,15 +26,23 @@ async function status(req, res) {
           type: 'expense',
           status: 'confirmed',
           deletedAt: null,
+          invoicePayment: { $ne: true },
           categoryId: { $ne: null },
           date: { $gte: start, $lt: end },
         },
       },
       { $group: { _id: '$categoryId', total: { $sum: '$amount' } } },
     ]),
+    loadCardSpending(req.userId, month),
   ]);
 
+  // Gasto da meta = lançamentos + compras do cartão na fatura do mês.
   const spent = new Map(spentRows.map((row) => [String(row._id), row.total]));
+  for (const item of card.byCategory) {
+    if (item.categoryId) {
+      spent.set(item.categoryId, (spent.get(item.categoryId) || 0) + item.total);
+    }
+  }
   const categories = await Category.find({
     _id: { $in: budgets.map((budget) => budget.categoryId) },
   });
