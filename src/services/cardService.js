@@ -67,6 +67,31 @@ function buildInvoice(charges, closingDay, month) {
   return { month, items, total: items.reduce((sum, item) => sum + item.amount, 0) };
 }
 
+// Gasto do mês pela fatura: soma as parcelas de todas as compras que caem em `month`,
+// separadas por categoria (categoryId null = sem categoria).
+function spendingForMonth(cards, charges, month) {
+  const closingDays = new Map(cards.map((card) => [String(card._id), card.closingDay]));
+  const byCategory = new Map();
+  let total = 0;
+  for (const charge of charges) {
+    const closingDay = closingDays.get(String(charge.cardId));
+    if (!closingDay) {
+      continue;
+    }
+    for (const part of installmentsOf(charge, closingDay)) {
+      if (part.month === month) {
+        const key = charge.categoryId ? String(charge.categoryId) : null;
+        byCategory.set(key, (byCategory.get(key) || 0) + part.amount);
+        total += part.amount;
+      }
+    }
+  }
+  return {
+    total,
+    byCategory: [...byCategory].map(([categoryId, amount]) => ({ categoryId, total: amount })),
+  };
+}
+
 module.exports = {
   MONTH_RE,
   MAX_INSTALLMENTS,
@@ -76,4 +101,5 @@ module.exports = {
   splitInstallments,
   installmentsOf,
   buildInvoice,
+  spendingForMonth,
 };
