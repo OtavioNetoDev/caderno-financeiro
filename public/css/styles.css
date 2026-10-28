@@ -729,3 +729,18 @@ textarea {
   stroke-width: 1;
   stroke-dasharray: 3 3;
 }
+
+.chart-slice {
+  stroke: var(--surface);
+}
+
+.chart-center {
+  fill: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.chart-grid polygon {
+  stroke: var(--border);
+  stroke-width: 1;
+}

@@ -213,6 +213,16 @@
         );
         return;
       }
+      if (definition.minCategories && spec.categories.length < definition.minCategories) {
+        stage.append(
+          el(
+            'p',
+            { class: 'muted chart-empty' },
+            'Este gráfico precisa de pelo menos ' + definition.minCategories + ' itens.',
+          ),
+        );
+        return;
+      }
       if (showTable) {
         stage.append(buildTable(spec, entities, format));
         return;
