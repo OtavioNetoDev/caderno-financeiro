@@ -1,5 +1,6 @@
 (function () {
-  const { el, money } = window.CF;
+  const CF = window.CF;
+  const { el, money } = CF;
 
   function analysis(summary) {
     if (summary.income === 0 && summary.expense === 0) {
@@ -16,6 +17,25 @@
       return 'Sobra positiva e ' + percent + '% investido. Dá para aumentar o ritmo dos aportes.';
     }
     return 'Sobra positiva, mas ainda nada foi investido neste mês.';
+  }
+
+  const CHOICE_KEY = 'cf_overview_chart';
+
+  function readChoice() {
+    try {
+      const saved = localStorage.getItem(CHOICE_KEY);
+      return CF.analyses.ALL_TYPES.includes(saved) ? saved : 'donut';
+    } catch {
+      return 'donut';
+    }
+  }
+
+  function saveChoice(type) {
+    try {
+      localStorage.setItem(CHOICE_KEY, type);
+    } catch {
+      // Sem armazenamento (janela privada): a escolha só vale nesta tela.
+    }
   }
 
   window.CF.renderDashboard = function renderDashboard(container, state) {
@@ -49,25 +69,38 @@
       byCategory.set(name, (byCategory.get(name) || 0) + item.total);
     }
     const ranking = [...byCategory.entries()].sort((a, b) => b[1] - a[1]);
-    const max = ranking.length ? ranking[0][1] : 1;
+    const folded = CF.chartsCore.foldOther(ranking.map(([label, value]) => ({ label, value })));
 
-    const bars = ranking.map(([name, total]) =>
-      el(
-        'div',
-        { class: 'bar-row' },
-        el('span', {}, name),
-        el(
-          'div',
-          { class: 'bar' },
-          el('div', {
-            class: 'bar-fill',
-            style: 'width:' + Math.max(2, Math.round((total / max) * 100)) + '%',
-          }),
-        ),
-        el('strong', {}, money.formatMoney(total)),
+    // O tipo do gráfico é escolha do usuário e fica salvo neste navegador.
+    const types = CF.analyses.ALL_TYPES;
+    let chartType = readChoice();
+    const chartHost = el('div');
+    function drawChart() {
+      chartHost.replaceChildren();
+      CF.charts.render(chartHost, {
+        type: chartType,
+        ariaLabel: 'Despesas por categoria no mês',
+        categories: folded.map((item) => item.label),
+        series: [{ name: 'Despesas', values: folded.map((item) => item.value) }],
+        emptyText: 'Sem despesas confirmadas neste mês.',
+      });
+    }
+    const typeSelect = el(
+      'select',
+      {
+        'aria-label': 'Tipo de gráfico',
+        onchange: (event) => {
+          chartType = event.target.value;
+          saveChoice(chartType);
+          drawChart();
+        },
+      },
+      types.map((type) =>
+        el('option', { value: type, selected: type === chartType }, CF.charts.types[type].label),
       ),
     );
 
+    drawChart();
     container.replaceChildren(
       el(
         'section',
@@ -93,8 +126,13 @@
       el(
         'section',
         { class: 'card' },
-        el('h2', {}, 'Despesas por categoria'),
-        bars.length ? bars : el('p', { class: 'muted' }, 'Sem despesas confirmadas neste mês.'),
+        el('div', { class: 'chart-head' }, el('h2', {}, 'Despesas por categoria'), typeSelect),
+        chartHost,
+        el(
+          'p',
+          { class: 'muted' },
+          'Mais gráficos (por mês, dia, pessoa, conta e outros) na aba Gráficos.',
+        ),
       ),
     );
   };

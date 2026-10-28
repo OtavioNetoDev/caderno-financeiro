@@ -232,7 +232,7 @@
         viewBox: '0 0 ' + WIDTH + ' ' + HEIGHT,
         class: 'chart-svg',
         role: 'img',
-        'aria-label': spec.title || 'Gráfico',
+        'aria-label': spec.ariaLabel || spec.title || 'Gráfico',
       });
       const ctx = {
         spec,
