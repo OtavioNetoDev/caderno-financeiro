@@ -64,22 +64,25 @@ Para usar em outro computador: `git clone`, `npm install`, criar o `.env` com a 
 
 Todos exigem `Authorization: Bearer <token>`, exceto `/health` e `/auth/*` (menos `/auth/me`).
 
-| Rota                                                            | Descrição                                                                                                    |
-| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `GET /health`                                                   | Status do serviço e do banco                                                                                 |
-| `POST /auth/register`, `/auth/login`                            | Cadastro e login                                                                                             |
-| `POST /auth/forgot-password`, `/auth/reset-password`            | Recuperação de senha                                                                                         |
-| `GET /auth/me`                                                  | Dados do usuário logado                                                                                      |
-| `/categories`, `/accounts`                                      | CRUD de categorias e contas                                                                                  |
-| `/transactions`                                                 | CRUD de lançamentos, com filtros `type`, `status`, `categoryId`, `accountId`, `from`, `to`, `page` e `limit` |
-| `GET /transactions/summary?month=AAAA-MM`                       | Resumo do mês                                                                                                |
-| `/debts`                                                        | Dívidas, com `POST /debts/:id/entries` e `GET /debts/summary`                                                |
-| `/investments`                                                  | Investimentos, com `/entries` e `GET /investments/summary`                                                   |
-| `/cards`                                                        | Cartões, compras em `/charges` e faturas em `/invoices/:month` (com `PUT` e `/pay`)                          |
-| `GET /budgets/status?month=AAAA-MM`, `PUT /budgets/:categoryId` | Metas por categoria                                                                                          |
-| `/notes`                                                        | Notas por mês                                                                                                |
-| `GET /export/transactions.csv`, `GET /export/backup.json`       | Exportação                                                                                                   |
-| `POST /restore` (multipart, `dryRun=true` só mostra a prévia)   | Restauração de backup                                                                                        |
+| Rota                                                                                                                   | Descrição                                                                                                    |
+| ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `GET /health`                                                                                                          | Status do serviço e do banco                                                                                 |
+| `POST /auth/register`, `/auth/login`                                                                                   | Cadastro e login                                                                                             |
+| `POST /auth/forgot-password`, `/auth/reset-password`                                                                   | Recuperação de senha                                                                                         |
+| `GET /auth/me`                                                                                                         | Dados do usuário logado                                                                                      |
+| `/categories`, `/accounts`                                                                                             | CRUD de categorias e contas                                                                                  |
+| `/transactions`                                                                                                        | CRUD de lançamentos, com filtros `type`, `status`, `categoryId`, `accountId`, `from`, `to`, `page` e `limit` |
+| `GET /transactions/summary?month=AAAA-MM`                                                                              | Resumo do mês                                                                                                |
+| `/debts`                                                                                                               | Dívidas, com `POST /debts/:id/entries` e `GET /debts/summary`                                                |
+| `/investments`                                                                                                         | Investimentos, com `/entries` e `GET /investments/summary`                                                   |
+| `/cards`                                                                                                               | Cartões, compras em `/charges` e faturas em `/invoices/:month` (com `PUT` e `/pay`)                          |
+| `GET /budgets/status?month=AAAA-MM`, `PUT /budgets/:categoryId`                                                        | Metas por categoria                                                                                          |
+| `/notes`                                                                                                               | Notas por mês                                                                                                |
+| `GET /reports/monthly?end=AAAA-MM&months=6`                                                                            | Receitas, despesas, aportes e lucro mês a mês (até 24 meses)                                                 |
+| `GET /reports/daily?month=AAAA-MM`                                                                                     | Movimento dia a dia do mês                                                                                   |
+| `GET /reports/breakdown?month=AAAA-MM&by=category\|account\|person\|weekday&type=expense\|income\|investment&months=1` | Totais por categoria, conta, pessoa ou dia da semana                                                         |
+| `GET /export/transactions.csv`, `GET /export/backup.json`                                                              | Exportação                                                                                                   |
+| `POST /restore` (multipart, `dryRun=true` só mostra a prévia)                                                          | Restauração de backup                                                                                        |
 
 Valores monetários sempre em **centavos** (inteiros).
 
