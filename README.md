@@ -38,6 +38,10 @@ Para usar em outro computador: `git clone`, `npm install`, criar o `.env` com a 
 ## Módulos
 
 - **Visão geral:** receitas, despesas, lucro, % investido, análise e gastos por categoria e por pessoa.
+- **Gráficos:** 10 análises (por mês, dia a dia, acumulado, por categoria, pessoa, conta, dia da semana e
+  patrimônio) em 8 tipos de gráfico à escolha (colunas, empilhadas, barras horizontais, linhas, área,
+  pizza, rosca e radar), com legenda, dica ao passar o mouse e visão em tabela. Até 6 gráficos ao mesmo
+  tempo, salvos no navegador.
 - **Lançamentos:** receitas, despesas, investimentos e transferências entre contas, com edição, lixeira,
   observações, status pendente e campo "com/de" uma pessoa.
 - **Contas:** saldo inicial, saldo atual, saldo previsto (com os pendentes) e patrimônio total.
@@ -107,7 +111,6 @@ Endpoints: `GET /imports/formats`, `POST /imports/preview` (multipart), `POST /i
 
 ## Roadmap
 
-- [ ] Gráficos escolhidos pelo usuário (barras, linhas, pizza, rosca e outros)
 - [ ] Busca e filtros na lista de lançamentos
 - [ ] Lançamentos recorrentes (assinaturas e mensalidades)
 - [ ] Testes automáticos no GitHub (CI)
