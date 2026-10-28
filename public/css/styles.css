@@ -719,3 +719,13 @@ textarea {
 .chart-table td:first-child {
   text-align: left;
 }
+
+.chart-dot {
+  stroke: var(--surface);
+}
+
+.chart-cursor {
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
