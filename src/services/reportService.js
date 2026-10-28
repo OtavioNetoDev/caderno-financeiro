@@ -12,6 +12,11 @@ function assertMonth(value, field = 'month') {
   return value;
 }
 
+// Mês atual no fuso America/Bahia, no formato AAAA-MM.
+function currentMonth(now = new Date()) {
+  return now.toLocaleDateString('en-CA', { timeZone: TIMEZONE }).slice(0, 7);
+}
+
 // Quantidade de meses: padrão 6, de 1 a 24.
 function parseMonthCount(value) {
   if (value === undefined || value === '') {
@@ -117,6 +122,7 @@ module.exports = {
   WEEKDAYS,
   assertMonth,
   parseMonthCount,
+  currentMonth,
   monthsEndingAt,
   monthBounds,
   daysInMonth,
