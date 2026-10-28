@@ -13,6 +13,7 @@ const noteRoutes = require('./routes/notes');
 const cardRoutes = require('./routes/cards');
 const budgetRoutes = require('./routes/budgets');
 const exportRoutes = require('./routes/export');
+const restoreRoutes = require('./routes/restore');
 const importRoutes = require('./routes/imports');
 const authenticate = require('./middlewares/authenticate');
 const { notFound, errorHandler } = require('./middlewares/errorHandler');
@@ -54,6 +55,8 @@ app.use('/cards', authenticate, cardRoutes);
 app.use('/budgets', authenticate, budgetRoutes);
 
 app.use('/export', authenticate, exportRoutes);
+
+app.use('/restore', authenticate, restoreRoutes);
 
 app.use('/imports', authenticate, importRoutes);
 
