@@ -9,6 +9,7 @@
   const SIGN = { income: '+ ', expense: '− ', investment: '' };
   const dayOf = (iso) => new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/Bahia' });
   let editingId = null;
+  const filters = { ...window.CF.transactionFilters.EMPTY };
 
   window.CF.renderTransactions = function renderTransactions(container, state, reload) {
     const current = state.transactions.find((item) => item._id === editingId) || null;
@@ -187,78 +188,114 @@
     const categoryNames = new Map(state.categories.map((item) => [item._id, item.name]));
     const accountNames = new Map(state.accounts.map((item) => [item._id, item.name]));
 
-    const rows = state.transactions.map((item) =>
-      el(
-        'li',
-        { class: 'tx' },
+    const buildRows = (items) =>
+      items.map((item) =>
         el(
-          'div',
-          { class: 'tx-main' },
+          'li',
+          { class: 'tx' },
           el(
-            'strong',
-            {},
-            item.description ||
-              categoryNames.get(item.categoryId) ||
-              TYPE_LABEL[item.type] ||
-              'Transferência',
+            'div',
+            { class: 'tx-main' },
+            el(
+              'strong',
+              {},
+              item.description ||
+                categoryNames.get(item.categoryId) ||
+                TYPE_LABEL[item.type] ||
+                'Transferência',
+            ),
+            el(
+              'span',
+              { class: 'muted' },
+              [
+                money.formatDate(item.date),
+                categoryNames.get(item.categoryId),
+                item.type === 'transfer' && item.toAccountId
+                  ? accountNames.get(item.accountId) + ' → ' + accountNames.get(item.toAccountId)
+                  : accountNames.get(item.accountId),
+                item.personName && (item.shareMode === 'for' ? 'de ' : 'com ') + item.personName,
+              ]
+                .filter(Boolean)
+                .join(' · '),
+            ),
+            item.notes && el('span', { class: 'muted' }, item.notes),
+            item.status === 'pending' && el('span', { class: 'badge' }, 'pendente'),
+            item.invoicePayment && el('span', { class: 'badge' }, 'pagamento de fatura'),
           ),
           el(
             'span',
+            { class: 'amount ' + item.type },
+            (SIGN[item.type] || '') + money.formatMoney(item.amount),
+          ),
+          el(
+            'div',
+            { class: 'actions' },
+            el(
+              'button',
+              {
+                class: 'btn small',
+                type: 'button',
+                onclick: () => {
+                  editingId = item._id;
+                  renderTransactions(container, state, reload);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                },
+              },
+              'Editar',
+            ),
+            el(
+              'button',
+              {
+                class: 'btn small danger',
+                type: 'button',
+                title: 'Excluir',
+                onclick: async () => {
+                  if (confirm('Excluir este lançamento?')) {
+                    await api('/transactions/' + item._id, { method: 'DELETE' });
+                    await reload();
+                  }
+                },
+              },
+              'Excluir',
+            ),
+          ),
+        ),
+      );
+
+    const names = { category: categoryNames, account: accountNames };
+    const { filterTransactions, totals, hasFilters } = window.CF.transactionFilters;
+    const listHost = el('div');
+
+    function drawList() {
+      const shown = filterTransactions(state.transactions, filters, names);
+      const active = hasFilters(filters);
+      const sum = totals(shown);
+      const summary =
+        active &&
+        el(
+          'p',
+          { class: 'muted' },
+          shown.length +
+            ' de ' +
+            state.transactions.length +
+            ' lançamentos · Receitas ' +
+            money.formatMoney(sum.income) +
+            ' · Despesas ' +
+            money.formatMoney(sum.expense) +
+            ' · Investido ' +
+            money.formatMoney(sum.investment) +
+            (sum.pending ? ' · ' + sum.pending + ' pendente(s) fora da soma' : ''),
+        );
+      const body = shown.length
+        ? el('ul', { class: 'list' }, ...buildRows(shown))
+        : el(
+            'p',
             { class: 'muted' },
-            [
-              money.formatDate(item.date),
-              categoryNames.get(item.categoryId),
-              item.type === 'transfer' && item.toAccountId
-                ? accountNames.get(item.accountId) + ' → ' + accountNames.get(item.toAccountId)
-                : accountNames.get(item.accountId),
-              item.personName && (item.shareMode === 'for' ? 'de ' : 'com ') + item.personName,
-            ]
-              .filter(Boolean)
-              .join(' · '),
-          ),
-          item.notes && el('span', { class: 'muted' }, item.notes),
-          item.status === 'pending' && el('span', { class: 'badge' }, 'pendente'),
-          item.invoicePayment && el('span', { class: 'badge' }, 'pagamento de fatura'),
-        ),
-        el(
-          'span',
-          { class: 'amount ' + item.type },
-          (SIGN[item.type] || '') + money.formatMoney(item.amount),
-        ),
-        el(
-          'div',
-          { class: 'actions' },
-          el(
-            'button',
-            {
-              class: 'btn small',
-              type: 'button',
-              onclick: () => {
-                editingId = item._id;
-                renderTransactions(container, state, reload);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              },
-            },
-            'Editar',
-          ),
-          el(
-            'button',
-            {
-              class: 'btn small danger',
-              type: 'button',
-              title: 'Excluir',
-              onclick: async () => {
-                if (confirm('Excluir este lançamento?')) {
-                  await api('/transactions/' + item._id, { method: 'DELETE' });
-                  await reload();
-                }
-              },
-            },
-            'Excluir',
-          ),
-        ),
-      ),
-    );
+            active ? 'Nenhum lançamento corresponde aos filtros.' : 'Nenhum lançamento neste mês.',
+          );
+      listHost.replaceChildren(...[summary, body].filter(Boolean));
+    }
+    drawList();
 
     container.replaceChildren(
       form,
@@ -266,9 +303,8 @@
         'section',
         { class: 'card' },
         el('h2', {}, 'Lançamentos do mês'),
-        rows.length
-          ? el('ul', { class: 'list' }, ...rows)
-          : el('p', { class: 'muted' }, 'Nenhum lançamento neste mês.'),
+        window.CF.renderFilterBar(state, filters, drawList),
+        listHost,
       ),
     );
   };
