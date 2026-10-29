@@ -779,3 +779,20 @@ textarea {
 .chart-controls .field {
   min-width: 0;
 }
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.filters input[type='search'] {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.filters select {
+  flex: 0 1 auto;
+  min-width: 0;
+}
