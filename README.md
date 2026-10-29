@@ -43,7 +43,8 @@ Para usar em outro computador: `git clone`, `npm install`, criar o `.env` com a 
   pizza, rosca e radar), com legenda, dica ao passar o mouse e visão em tabela. Até 6 gráficos ao mesmo
   tempo, salvos no navegador.
 - **Lançamentos:** receitas, despesas, investimentos e transferências entre contas, com edição, lixeira,
-  observações, status pendente e campo "com/de" uma pessoa.
+  observações, status pendente e campo "com/de" uma pessoa. A lista tem busca (sem diferenciar acento
+  ou maiúscula) e filtros por tipo, status e categoria, com os totais do que está filtrado.
 - **Contas:** saldo inicial, saldo atual, saldo previsto (com os pendentes) e patrimônio total.
 - **Cartões:** compras parceladas, fatura por mês, conciliação com o valor do banco e pagamento
   (as compras entram no resumo e nas metas por categoria; o pagamento da fatura não conta duas vezes).
@@ -111,7 +112,6 @@ Endpoints: `GET /imports/formats`, `POST /imports/preview` (multipart), `POST /i
 
 ## Roadmap
 
-- [ ] Busca e filtros na lista de lançamentos
 - [ ] Lançamentos recorrentes (assinaturas e mensalidades)
 - [ ] Testes automáticos no GitHub (CI)
 - [ ] Hospedagem com HTTPS e backup automático
