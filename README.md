@@ -45,6 +45,8 @@ Para usar em outro computador: `git clone`, `npm install`, criar o `.env` com a 
 - **Lançamentos:** receitas, despesas, investimentos e transferências entre contas, com edição, lixeira,
   observações, status pendente e campo "com/de" uma pessoa. A lista tem busca (sem diferenciar acento
   ou maiúscula) e filtros por tipo, status e categoria, com os totais do que está filtrado.
+- **Recorrentes:** assinaturas e mensalidades (Netflix, aluguel, salário). Um clique gera os
+  lançamentos do mês, sem repetir os que já existem; dá para pausar, editar o valor e definir fim.
 - **Contas:** saldo inicial, saldo atual, saldo previsto (com os pendentes) e patrimônio total.
 - **Cartões:** compras parceladas, fatura por mês, conciliação com o valor do banco e pagamento
   (as compras entram no resumo e nas metas por categoria; o pagamento da fatura não conta duas vezes).
@@ -86,6 +88,7 @@ Todos exigem `Authorization: Bearer <token>`, exceto `/health` e `/auth/*` (meno
 | `GET /reports/monthly?end=AAAA-MM&months=6`                                                                            | Receitas, despesas, aportes e lucro mês a mês (até 24 meses)                                                 |
 | `GET /reports/daily?month=AAAA-MM`                                                                                     | Movimento dia a dia do mês                                                                                   |
 | `GET /reports/breakdown?month=AAAA-MM&by=category\|account\|person\|weekday&type=expense\|income\|investment&months=1` | Totais por categoria, conta, pessoa ou dia da semana                                                         |
+| `/recurring`                                                                                                           | CRUD de recorrentes, com `POST /recurring/generate` (gera os lançamentos do mês)                             |
 | `GET /export/transactions.csv`, `GET /export/backup.json`                                                              | Exportação                                                                                                   |
 | `POST /restore` (multipart, `dryRun=true` só mostra a prévia)                                                          | Restauração de backup                                                                                        |
 
@@ -112,7 +115,7 @@ Endpoints: `GET /imports/formats`, `POST /imports/preview` (multipart), `POST /i
 
 ## Roadmap
 
-- [ ] Lançamentos recorrentes (assinaturas e mensalidades)
+- [ ] Incluir os recorrentes no backup e na restauração
 - [ ] Testes automáticos no GitHub (CI)
 - [ ] Hospedagem com HTTPS e backup automático
 - [ ] Cofrinhos com cota própria e regras de categorização editáveis
