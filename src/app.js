@@ -16,6 +16,7 @@ const exportRoutes = require('./routes/export');
 const restoreRoutes = require('./routes/restore');
 const importRoutes = require('./routes/imports');
 const reportRoutes = require('./routes/reports');
+const recurringRoutes = require('./routes/recurring');
 const authenticate = require('./middlewares/authenticate');
 const { notFound, errorHandler } = require('./middlewares/errorHandler');
 
@@ -62,6 +63,8 @@ app.use('/restore', authenticate, restoreRoutes);
 app.use('/imports', authenticate, importRoutes);
 
 app.use('/reports', authenticate, reportRoutes);
+
+app.use('/recurring', authenticate, recurringRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
