@@ -47,6 +47,9 @@ const transactionSchema = new Schema(
     // Pagamento de fatura de cartão: sai da conta, mas não conta como despesa do mês,
     // porque as compras da fatura já entram por categoria. Só o servidor define este campo.
     invoicePayment: { type: Boolean, default: false },
+    // Lançamento gerado por um recorrente: de qual e para qual mês. Só o servidor define.
+    recurringId: { type: Schema.Types.ObjectId, default: null },
+    recurringMonth: { type: String, default: '' },
     deletedAt: { type: Date, default: null },
   },
   { timestamps: true },
@@ -68,5 +71,10 @@ transactionSchema.pre('validate', function validateTransfer() {
 transactionSchema.index({ userId: 1, date: -1 });
 transactionSchema.index({ userId: 1, categoryId: 1, date: -1 });
 transactionSchema.index({ userId: 1, status: 1 });
+// Um recorrente gera no máximo um lançamento por mês, mesmo com dois cliques seguidos.
+transactionSchema.index(
+  { userId: 1, recurringId: 1, recurringMonth: 1 },
+  { unique: true, partialFilterExpression: { recurringId: { $type: 'objectId' } } },
+);
 
 module.exports = model('Transaction', transactionSchema);
