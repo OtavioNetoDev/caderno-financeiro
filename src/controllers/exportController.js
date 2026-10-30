@@ -6,6 +6,7 @@ const Category = require('../models/Category');
 const Debt = require('../models/Debt');
 const Investment = require('../models/Investment');
 const Note = require('../models/Note');
+const Recurring = require('../models/Recurring');
 const Transaction = require('../models/Transaction');
 const { toCsv } = require('../utils/csv');
 
@@ -83,6 +84,7 @@ async function backup(req, res) {
     cards,
     cardCharges,
     budgets,
+    recurring,
   ] = await Promise.all([
     Account.find(own).lean(),
     Category.find(own).lean(),
@@ -93,6 +95,7 @@ async function backup(req, res) {
     Card.find(own).lean(),
     CardCharge.find(own).lean(),
     Budget.find(own).lean(),
+    Recurring.find(own).lean(),
   ]);
 
   const stamp = new Date().toISOString().slice(0, 10);
@@ -115,6 +118,7 @@ async function backup(req, res) {
         cards,
         cardCharges,
         budgets,
+        recurring,
       },
       null,
       2,
