@@ -6,6 +6,7 @@ const Category = require('../models/Category');
 const Debt = require('../models/Debt');
 const Investment = require('../models/Investment');
 const Note = require('../models/Note');
+const Recurring = require('../models/Recurring');
 const Transaction = require('../models/Transaction');
 const AppError = require('../utils/AppError');
 const { parseBackup, classify, brokenReferences } = require('../services/restoreService');
@@ -14,6 +15,7 @@ const MODELS = {
   accounts: Account,
   categories: Category,
   cards: Card,
+  recurring: Recurring,
   transactions: Transaction,
   cardCharges: CardCharge,
   budgets: Budget,

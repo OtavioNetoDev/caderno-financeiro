@@ -24,6 +24,7 @@
     accounts: 'Contas',
     categories: 'Categorias',
     cards: 'Cartões',
+    recurring: 'Recorrentes',
     transactions: 'Lançamentos',
     cardCharges: 'Compras no cartão',
     budgets: 'Metas',
