@@ -56,8 +56,8 @@ Para usar em outro computador: `git clone`, `npm install`, criar o `.env` com a 
 - **Metas:** limite mensal por categoria, com alertas.
 - **Notas:** observações por mês.
 - **Cadastros:** contas e categorias (criar, renomear, arquivar e excluir).
-- **Exportar:** CSV de lançamentos (protegido contra injeção de fórmulas), backup completo em JSON e
-  restauração de backup com prévia antes de gravar.
+- **Exportar:** CSV de lançamentos (protegido contra injeção de fórmulas), backup completo em JSON (com os
+  recorrentes) e restauração de backup com prévia antes de gravar.
 
 ## Segurança
 
@@ -115,7 +115,6 @@ Endpoints: `GET /imports/formats`, `POST /imports/preview` (multipart), `POST /i
 
 ## Roadmap
 
-- [ ] Incluir os recorrentes no backup e na restauração
 - [ ] Testes automáticos no GitHub (CI)
 - [ ] Hospedagem com HTTPS e backup automático
 - [ ] Cofrinhos com cota própria e regras de categorização editáveis
