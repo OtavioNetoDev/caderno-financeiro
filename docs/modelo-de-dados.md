@@ -220,7 +220,9 @@ Diferenças entre o desenho acima e o que foi implementado:
 - **Cartões:** `cards` guarda o dia de fechamento e vencimento, além das faturas conferidas (`invoices`: valor informado pelo banco, pago, valor pago). As compras ficam em `cardcharges` (com `installments`). A fatura de cada mês e as parcelas são calculadas a partir das compras e do dia de fechamento, sem coleção própria.
 - **Metas:** `budgets`, com uma meta mensal por categoria e usuário.
 - **Notas:** `notes`, por mês.
+- **Recorrentes:** `recurring`, modelo de um lançamento mensal (descrição, valor em centavos, tipo, dia do mês, mês inicial e final, conta e categoria). Os lançamentos reais são gerados mês a mês e guardam `recurringId` e `recurringMonth`, com índice único para nunca duplicar o mesmo mês. Entram no backup e na restauração.
 - **Usuários:** além de nome, e-mail e hash da senha, guardam o hash do código de recuperação (`resetTokenHash`, `resetTokenExpires`) e `passwordChangedAt`, usado para encerrar sessões antigas.
-- **Ainda não implementados:** `reserves` (cofrinhos com cota própria), `category_rules` (regras de categorização automática) e `import_batches` (importador de documentos).
+- **Importação:** `import_batches` registra cada lote importado, e os lançamentos guardam `importBatchId` para desfazer o lote inteiro.
+- **Ainda não implementados:** `reserves` (cofrinhos com cota própria) e `category_rules` (regras de categorização editáveis).
 
 Todos os valores monetários continuam em centavos (inteiros) e todos os documentos têm `userId`.
