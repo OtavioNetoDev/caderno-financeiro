@@ -54,6 +54,16 @@ test('regra extra de duplicidade pula o item', () => {
   assert.deepStrictEqual([result.insert.length, result.skip.length], [0, 1]);
 });
 
+test('lê o backup antigo, sem recorrentes, como lista vazia', () => {
+  const { collections } = parseBackup(backup({ accounts: [{ _id: id(1) }] }));
+  assert.deepStrictEqual(collections.recurring, []);
+});
+
+test('recusa recorrentes inválidos', () => {
+  assert.throws(() => parseBackup(backup({ recurring: {} })), /recurring/);
+  assert.throws(() => parseBackup(backup({ recurring: [{ description: 'x' }] })), /recurring/);
+});
+
 test('encontra referências quebradas', () => {
   const incoming = {
     transactions: [{ accountId: id(1), categoryId: id(9) }, { accountId: id(7) }],
@@ -67,5 +77,19 @@ test('encontra referências quebradas', () => {
   assert.deepStrictEqual(brokenReferences(incoming, known), [
     { collection: 'transactions', field: 'accountId', count: 1 },
     { collection: 'transactions', field: 'categoryId', count: 1 },
+  ]);
+});
+
+test('encontra recorrentes que apontam para conta ou categoria inexistente', () => {
+  const incoming = {
+    recurring: [
+      { accountId: id(1), categoryId: id(2) },
+      { accountId: id(8), categoryId: id(9) },
+    ],
+  };
+  const known = { accounts: new Set([id(1)]), categories: new Set([id(2)]), cards: new Set() };
+  assert.deepStrictEqual(brokenReferences(incoming, known), [
+    { collection: 'recurring', field: 'accountId', count: 1 },
+    { collection: 'recurring', field: 'categoryId', count: 1 },
   ]);
 });

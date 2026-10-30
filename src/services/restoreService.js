@@ -4,6 +4,7 @@ const COLLECTIONS = [
   'accounts',
   'categories',
   'cards',
+  'recurring',
   'transactions',
   'cardCharges',
   'budgets',
@@ -21,6 +22,8 @@ const REFERENCES = [
   ['cardCharges', 'cardId', 'cards'],
   ['cardCharges', 'categoryId', 'categories'],
   ['budgets', 'categoryId', 'categories'],
+  ['recurring', 'accountId', 'accounts'],
+  ['recurring', 'categoryId', 'categories'],
 ];
 
 const isObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
