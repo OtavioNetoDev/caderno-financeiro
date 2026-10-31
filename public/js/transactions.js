@@ -303,6 +303,16 @@
         'section',
         { class: 'card' },
         el('h2', {}, 'Lançamentos do mês'),
+        state.transactionsTotal > state.transactions.length &&
+          el(
+            'p',
+            { class: 'error' },
+            'Mostrando ' +
+              state.transactions.length +
+              ' de ' +
+              state.transactionsTotal +
+              ' lançamentos do mês. Use o CSV em Exportar para ver todos.',
+          ),
         window.CF.renderFilterBar(state, filters, drawList),
         listHost,
       ),

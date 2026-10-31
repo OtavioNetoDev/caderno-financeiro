@@ -50,7 +50,7 @@
       api('/accounts'),
       api('/accounts/balances'),
       api('/categories'),
-      api('/transactions' + query),
+      CF.paging.fetchAllPages((page) => api('/transactions' + query + '&page=' + page)),
       api('/transactions/summary?month=' + state.month),
     ]);
     Object.assign(state, {
@@ -58,6 +58,7 @@
       balances,
       categories,
       transactions: transactions.items,
+      transactionsTotal: transactions.total,
       summary,
     });
   }
