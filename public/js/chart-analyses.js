@@ -35,7 +35,19 @@
     profit: 'var(--series-7)',
   };
 
-  const ALL_TYPES = ['bar', 'stacked', 'hbar', 'line', 'area', 'pie', 'donut', 'radar'];
+  const ALL_TYPES = [
+    'bar',
+    'stacked',
+    'hbar',
+    'line',
+    'area',
+    'pie',
+    'donut',
+    'radar',
+    'polar',
+    'funnel',
+    'treemap',
+  ];
 
   // Ordena do maior para o menor e agrupa o excedente em "Outros" (a paleta tem 8 cores).
   function rankedSpec(items, nameOf, seriesName, categoryLabel) {

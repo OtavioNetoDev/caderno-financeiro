@@ -734,12 +734,23 @@ textarea {
   stroke: var(--surface);
 }
 
+.chart-label {
+  fill: var(--text);
+  stroke: var(--surface);
+  stroke-width: 3px;
+  paint-order: stroke;
+  font-size: 11px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
 .chart-center {
   fill: var(--text);
   font-size: 15px;
   font-weight: 700;
 }
 
+.chart-grid circle,
 .chart-grid polygon {
   stroke: var(--border);
   stroke-width: 1;

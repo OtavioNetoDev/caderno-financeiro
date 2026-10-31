@@ -258,7 +258,7 @@
 
     function drawLegend() {
       legend.replaceChildren(
-        ...(all.length > 1 || definition.slices
+        ...((all.length > 1 || definition.slices) && !definition.noLegend
           ? all.map((item) =>
               el(
                 'button',
