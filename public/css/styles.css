@@ -796,3 +796,29 @@ textarea {
   flex: 0 1 auto;
   min-width: 0;
 }
+
+.compare {
+  display: grid;
+  gap: 0.25rem;
+  margin-top: 0.75rem;
+}
+
+.compare-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.2rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.compare-row:last-child {
+  border-bottom: 0;
+}
+
+.tone-good {
+  color: var(--income);
+}
+
+.tone-bad {
+  color: var(--expense);
+}

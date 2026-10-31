@@ -19,6 +19,39 @@
     return 'Sobra positiva, mas ainda nada foi investido neste mês.';
   }
 
+  // Compara com o mês anterior usando as mesmas regras do resumo (GET /reports/monthly).
+  async function loadComparison(host, month) {
+    try {
+      const data = await CF.api('/reports/monthly?end=' + month + '&months=2');
+      const result = CF.comparison.compareMonths(data);
+      // Se a tela já foi trocada (outro mês ou outra aba), não pinta em cima.
+      if (!result || !host.isConnected) {
+        return;
+      }
+      host.replaceChildren(
+        el(
+          'span',
+          { class: 'muted' },
+          'Comparado com ' + CF.analyses.monthLabel(result.previousMonth) + ':',
+        ),
+        ...result.items.map((item) =>
+          el(
+            'div',
+            { class: 'compare-row' },
+            el('span', {}, item.label),
+            el(
+              'strong',
+              { class: 'tone-' + item.tone },
+              CF.comparison.describeChange(item, money.formatMoney),
+            ),
+          ),
+        ),
+      );
+    } catch {
+      // A comparação é um extra: se falhar, o resumo do mês continua normal.
+    }
+  }
+
   const CHOICE_KEY = 'cf_overview_chart';
 
   function readChoice() {
@@ -100,6 +133,7 @@
       ),
     );
 
+    const compareHost = el('div', { class: 'compare' });
     drawChart();
     container.replaceChildren(
       el(
@@ -122,6 +156,7 @@
           stat('Pendente (despesas)', money.formatMoney(pending), ''),
         ),
         el('p', { class: 'muted' }, analysis(summary)),
+        compareHost,
       ),
       el(
         'section',
@@ -135,5 +170,6 @@
         ),
       ),
     );
+    loadComparison(compareHost, state.month);
   };
 })();
