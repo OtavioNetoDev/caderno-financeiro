@@ -1,5 +1,7 @@
 # Caderno Financeiro
 
+[![CI](https://github.com/OtavioNetoDev/caderno-financeiro/actions/workflows/ci.yml/badge.svg)](https://github.com/OtavioNetoDev/caderno-financeiro/actions/workflows/ci.yml)
+
 Sistema de controle financeiro pessoal, com login, para usar em vários computadores: lançamentos,
 categorias, contas, transferências, cartão de crédito, investimentos (com projeção de até 100 anos),
 dívidas, metas, notas, importação de documentos, exportação e restauração de backup.
@@ -38,10 +40,11 @@ Para usar em outro computador: `git clone`, `npm install`, criar o `.env` com a 
 ## Módulos
 
 - **Visão geral:** receitas, despesas, lucro, % investido, análise e gastos por categoria e por pessoa.
-- **Gráficos:** 10 análises (por mês, dia a dia, acumulado, por categoria, pessoa, conta, dia da semana e
-  patrimônio) em 8 tipos de gráfico à escolha (colunas, empilhadas, barras horizontais, linhas, área,
-  pizza, rosca e radar), com legenda, dica ao passar o mouse e visão em tabela. Até 6 gráficos ao mesmo
-  tempo, salvos no navegador.
+- **Gráficos:** 11 análises (por mês, dia a dia, acumulado, cascata do mês, por categoria, pessoa, conta,
+  dia da semana e patrimônio) em 13 tipos de gráfico à escolha (colunas, empilhadas, barras
+  horizontais, linhas, área, pizza, rosca, radar, área polar, funil, treemap, cascata e mapa de calor),
+  com legenda, dica ao passar o mouse e visão em tabela. Até 6 gráficos ao mesmo tempo, salvos no
+  navegador.
 - **Lançamentos:** receitas, despesas, investimentos e transferências entre contas, com edição, lixeira,
   observações, status pendente e campo "com/de" uma pessoa. A lista tem busca (sem diferenciar acento
   ou maiúscula) e filtros por tipo, status e categoria, com os totais do que está filtrado.
@@ -115,7 +118,6 @@ Endpoints: `GET /imports/formats`, `POST /imports/preview` (multipart), `POST /i
 
 ## Roadmap
 
-- [ ] Testes automáticos no GitHub (CI)
 - [ ] Hospedagem com HTTPS e backup automático
 - [ ] Cofrinhos com cota própria e regras de categorização editáveis
 - [ ] Leitura de PDF escaneado (OCR)

@@ -41,7 +41,7 @@ Sistema financeiro individual, utilizável também por outras pessoas, para uso 
 ### Análise e visualização
 
 - **RF20:** Dashboard mensal com receita, despesa, **lucro (sobra)**, % investido e % gasto por categoria.
-- **RF21:** Gráficos de pizza, barras e linha, com comparação mês a mês.
+- **RF21:** Gráficos com comparação mês a mês, e o usuário escolhe o tipo: colunas, barras, linha, área, pizza, rosca, radar, área polar, funil, treemap, cascata e mapa de calor.
 - **RF22:** Análise automática em texto (ex.: "este mês você gastou 18% a mais em lanche que no anterior").
 - **RF23:** Metas e orçamentos por categoria (ex.: cota de R$ 100 de lanche), com alerta quando acabar.
 - **RF24:** Cofrinhos/reservas (lanche, emergência) com saldo próprio.
