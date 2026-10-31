@@ -108,3 +108,100 @@ test('movingAverage e cumulative', () => {
   assert.deepStrictEqual(core.movingAverage([10, 20, 30, 40], 2), [10, 15, 25, 35]);
   assert.deepStrictEqual(core.cumulative([5, 10, 0, 5]), [5, 15, 15, 20]);
 });
+
+test('polarRadii divide o círculo em partes iguais e usa a raiz do valor no raio', () => {
+  const result = core.polarRadii(
+    [
+      { label: 'a', value: 100 },
+      { label: 'b', value: 25 },
+      { label: 'c', value: 0 },
+    ],
+    80,
+  );
+  assert.strictEqual(result.length, 2);
+  assert.ok(Math.abs(result[0].to - Math.PI) < 1e-9);
+  assert.strictEqual(result[0].radius, 80);
+  assert.strictEqual(result[1].radius, 40);
+  assert.deepStrictEqual(core.polarRadii([], 80), []);
+});
+
+test('funnelBars centraliza as barras, do maior para o menor', () => {
+  const bars = core.funnelBars(
+    [
+      { label: 'b', value: 50 },
+      { label: 'a', value: 100 },
+    ],
+    200,
+    100,
+    10,
+  );
+  assert.strictEqual(bars[0].label, 'a');
+  assert.strictEqual(bars[0].width, 200);
+  assert.strictEqual(bars[0].x, 0);
+  assert.strictEqual(bars[1].width, 100);
+  assert.strictEqual(bars[1].x, 50);
+  assert.strictEqual(bars[1].percent, 50);
+  assert.strictEqual(bars[1].y, bars[0].height + 10);
+  assert.deepStrictEqual(core.funnelBars([{ label: 'x', value: 0 }], 100, 50), []);
+});
+
+test('treemapLayout preenche o retângulo com áreas proporcionais ao valor', () => {
+  const items = [
+    { label: 'a', value: 6 },
+    { label: 'b', value: 6 },
+    { label: 'c', value: 4 },
+    { label: 'd', value: 3 },
+    { label: 'e', value: 2 },
+    { label: 'f', value: 2 },
+    { label: 'g', value: 1 },
+  ];
+  const rects = core.treemapLayout(items, 600, 400);
+  assert.strictEqual(rects.length, items.length);
+  const area = rects.reduce((sum, r) => sum + r.w * r.h, 0);
+  assert.ok(Math.abs(area - 600 * 400) < 50, 'a soma das áreas cobre o retângulo');
+  const total = items.reduce((sum, item) => sum + item.value, 0);
+  for (const rect of rects) {
+    assert.ok(rect.x >= -0.01 && rect.y >= -0.01);
+    assert.ok(rect.x + rect.w <= 600.05 && rect.y + rect.h <= 400.05);
+    const expected = (rect.value / total) * 600 * 400;
+    assert.ok(Math.abs(rect.w * rect.h - expected) < 20, rect.label);
+  }
+  assert.deepStrictEqual(core.treemapLayout([], 100, 100), []);
+  assert.deepStrictEqual(core.treemapLayout(items, 0, 100), []);
+});
+
+test('waterfallSteps acumula os valores e fecha com a barra de total', () => {
+  const steps = core.waterfallSteps([1000, -300, -200]);
+  assert.deepStrictEqual(
+    steps.map((s) => [s.start, s.end, s.kind]),
+    [
+      [0, 1000, 'up'],
+      [1000, 700, 'down'],
+      [700, 500, 'down'],
+      [0, 500, 'total'],
+    ],
+  );
+  const deficit = core.waterfallSteps([100, -300]);
+  assert.strictEqual(deficit[2].end, -200);
+});
+
+test('heatLevel vai de 0 (sem valor) ao nível máximo', () => {
+  assert.strictEqual(core.heatLevel(0, 100), 0);
+  assert.strictEqual(core.heatLevel(-5, 100), 0);
+  assert.strictEqual(core.heatLevel(10, 0), 0);
+  assert.strictEqual(core.heatLevel(1, 100), 1);
+  assert.strictEqual(core.heatLevel(50, 100), 2);
+  assert.strictEqual(core.heatLevel(100, 100), 4);
+});
+
+test('calendarGrid monta semanas de domingo a sábado', () => {
+  // 1º de outubro de 2026 cai numa quinta-feira.
+  const weeks = core.calendarGrid('2026-10');
+  assert.strictEqual(weeks.length, 5);
+  assert.ok(weeks.every((week) => week.length === 7));
+  assert.deepStrictEqual(weeks[0], [null, null, null, null, 1, 2, 3]);
+  assert.strictEqual(weeks[4][6], 31);
+  assert.strictEqual(weeks.flat().filter(Boolean).length, 31);
+  // Fevereiro de 2026 começa num domingo e tem 28 dias: exatamente 4 semanas.
+  assert.strictEqual(core.calendarGrid('2026-02').length, 4);
+});

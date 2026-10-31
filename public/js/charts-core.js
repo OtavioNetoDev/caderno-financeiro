@@ -174,6 +174,151 @@
     return values.map((value) => (sum += value));
   }
 
+  // Área polar: fatias de mesmo ângulo; o raio cresce com a raiz do valor (a área fica proporcional).
+  function polarRadii(items, maxRadius) {
+    const valid = items.filter((item) => item.value > 0);
+    const max = Math.max(...valid.map((item) => item.value), 0);
+    const step = valid.length ? (Math.PI * 2) / valid.length : 0;
+    return valid.map((item, index) => ({
+      ...item,
+      from: index * step,
+      to: (index + 1) * step,
+      radius: max > 0 ? round(maxRadius * Math.sqrt(item.value / max)) : 0,
+    }));
+  }
+
+  // Funil: barras centralizadas, do maior para o menor; `percent` é relativo à primeira etapa.
+  function funnelBars(items, width, height, gap = 6) {
+    const valid = items.filter((item) => item.value > 0).sort((a, b) => b.value - a.value);
+    if (!valid.length) {
+      return [];
+    }
+    const barHeight = Math.max(1, (height - gap * (valid.length - 1)) / valid.length);
+    const top = valid[0].value;
+    return valid.map((item, index) => {
+      const w = (width * item.value) / top;
+      return {
+        ...item,
+        x: round((width - w) / 2),
+        y: round(index * (barHeight + gap)),
+        width: round(w),
+        height: round(barHeight),
+        percent: Math.round((item.value / top) * 1000) / 10,
+      };
+    });
+  }
+
+  // Treemap (método "squarified"): retângulos com área proporcional ao valor, dentro de width x height.
+  function treemapLayout(items, width, height) {
+    const nodes = items.filter((item) => item.value > 0).sort((a, b) => b.value - a.value);
+    const total = nodes.reduce((sum, item) => sum + item.value, 0);
+    if (!nodes.length || width <= 0 || height <= 0) {
+      return [];
+    }
+    const scale = (width * height) / total;
+    const sized = nodes.map((item) => ({ ...item, area: item.value * scale }));
+    const placed = [];
+    let free = { x: 0, y: 0, w: width, h: height };
+    let row = [];
+
+    const worst = (list, side) => {
+      const sum = list.reduce((acc, node) => acc + node.area, 0);
+      const areas = list.map((node) => node.area);
+      return Math.max(
+        (side * side * Math.max(...areas)) / (sum * sum),
+        (sum * sum) / (side * side * Math.min(...areas)),
+      );
+    };
+
+    const flush = () => {
+      const sum = row.reduce((acc, node) => acc + node.area, 0);
+      if (free.w >= free.h) {
+        const w = sum / free.h;
+        let y = free.y;
+        for (const node of row) {
+          const h = node.area / w;
+          placed.push({ ...node, x: free.x, y, w, h });
+          y += h;
+        }
+        free = { x: free.x + w, y: free.y, w: free.w - w, h: free.h };
+      } else {
+        const h = sum / free.w;
+        let x = free.x;
+        for (const node of row) {
+          const w = node.area / h;
+          placed.push({ ...node, x, y: free.y, w, h });
+          x += w;
+        }
+        free = { x: free.x, y: free.y + h, w: free.w, h: free.h - h };
+      }
+      row = [];
+    };
+
+    for (const node of sized) {
+      const side = Math.min(free.w, free.h);
+      if (!row.length || worst([...row, node], side) <= worst(row, side)) {
+        row.push(node);
+      } else {
+        flush();
+        row.push(node);
+      }
+    }
+    if (row.length) {
+      flush();
+    }
+    return placed.map((node) => {
+      const rect = {
+        ...node,
+        x: round(node.x),
+        y: round(node.y),
+        w: round(node.w),
+        h: round(node.h),
+      };
+      delete rect.area;
+      return rect;
+    });
+  }
+
+  // Cascata: cada valor sobe (positivo) ou desce (negativo) a partir do acumulado.
+  // Devolve as etapas e, no fim, a barra de total (de 0 até o acumulado final).
+  function waterfallSteps(values) {
+    let running = 0;
+    const steps = values.map((value) => {
+      const start = running;
+      running += value || 0;
+      return { value: value || 0, start, end: running, kind: (value || 0) >= 0 ? 'up' : 'down' };
+    });
+    steps.push({ value: running, start: 0, end: running, kind: 'total' });
+    return steps;
+  }
+
+  // Nível de intensidade de 0 (sem valor) a `levels` (maior valor), para o mapa de calor.
+  function heatLevel(value, max, levels = 4) {
+    if (!(value > 0) || !(max > 0)) {
+      return 0;
+    }
+    return Math.min(levels, Math.max(1, Math.ceil((value / max) * levels)));
+  }
+
+  // Calendário do mês ("2026-10") em semanas de domingo a sábado; dias fora do mês ficam null.
+  function calendarGrid(month) {
+    const [year, mon] = month.split('-').map(Number);
+    const offset = new Date(Date.UTC(year, mon - 1, 1)).getUTCDay();
+    const days = new Date(Date.UTC(year, mon, 0)).getUTCDate();
+    const cells = [
+      ...Array.from({ length: offset }, () => null),
+      ...Array.from({ length: days }, (_, i) => i + 1),
+    ];
+    while (cells.length % 7) {
+      cells.push(null);
+    }
+    const weeks = [];
+    for (let i = 0; i < cells.length; i += 7) {
+      weeks.push(cells.slice(i, i + 7));
+    }
+    return weeks;
+  }
+
   const core = {
     PALETTE_SIZE,
     niceScale,
@@ -189,6 +334,12 @@
     radarPoints,
     movingAverage,
     cumulative,
+    polarRadii,
+    funnelBars,
+    treemapLayout,
+    waterfallSteps,
+    heatLevel,
+    calendarGrid,
   };
 
   if (typeof module !== 'undefined' && module.exports) {
