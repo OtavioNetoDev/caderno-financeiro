@@ -132,6 +132,178 @@
     ctx.root.append(group);
   }
 
+  // Cascata: parte de zero, soma cada item (sobe ou desce) e fecha com a barra do resultado.
+  function drawWaterfall(ctx) {
+    const { m, plotW, plotH, entities } = ctx;
+    const steps = core.waterfallSteps(entities.map((item) => item.value));
+    const labels = [...entities.map((item) => item.name), 'Resultado'];
+    const edges = steps.flatMap((step) => [step.start, step.end]);
+    const range = core.niceRange(Math.min(...edges, 0), Math.max(...edges, 0));
+    const toY = ctx.drawYAxis(range);
+    const band = plotW / steps.length;
+    const barW = Math.max(6, band * 0.6);
+    const colors = { up: 'var(--series-3)', down: 'var(--series-2)', total: 'var(--series-7)' };
+    const group = svg('g');
+
+    steps.forEach((step, index) => {
+      const x = m.left + band * index + (band - barW) / 2;
+      const top = Math.min(toY(step.start), toY(step.end));
+      const color = colors[step.kind];
+      if (index > 0) {
+        const previous = steps[index - 1];
+        group.append(
+          svg('line', {
+            x1: x - (band - barW),
+            x2: x,
+            y1: toY(previous.end),
+            y2: toY(previous.end),
+            class: 'chart-cursor',
+          }),
+        );
+      }
+      group.append(
+        svg('rect', {
+          x,
+          y: top,
+          width: barW,
+          height: Math.max(1, Math.abs(toY(step.end) - toY(step.start))),
+          rx: 3,
+          style: 'fill:' + color,
+          onmousemove: (event) =>
+            ctx.tip.show(event, labels[index], [
+              {
+                color,
+                label: step.kind === 'total' ? 'Resultado' : 'Valor',
+                value: ctx.format(step.value),
+              },
+              ...(step.kind === 'total'
+                ? []
+                : [{ color, label: 'Acumulado', value: ctx.format(step.end) }]),
+            ]),
+        }),
+        svg(
+          'text',
+          {
+            x: m.left + band * index + band / 2,
+            y: m.top + plotH + 20,
+            'text-anchor': 'middle',
+            class: 'chart-tick',
+          },
+          clip(labels[index], Math.max(5, Math.floor(band / 7))),
+        ),
+      );
+      if (steps.length <= 8) {
+        group.append(
+          svg(
+            'text',
+            {
+              x: m.left + band * index + band / 2,
+              y: top - 6,
+              'text-anchor': 'middle',
+              class: 'chart-label',
+            },
+            ctx.format(step.value),
+          ),
+        );
+      }
+    });
+    ctx.root.append(group);
+  }
+
+  const LEVEL_OPACITY = [0.14, 0.32, 0.52, 0.75, 1];
+
+  // Mapa de calor: calendário do mês quando o gráfico informa o mês; senão, uma grade de blocos.
+  function drawHeatmap(ctx) {
+    const { m, plotW, plotH, entities, spec } = ctx;
+    const color = (spec.series[0] && spec.series[0].color) || 'var(--series-1)';
+    const max = Math.max(...entities.map((item) => item.value), 0);
+    const byName = new Map(entities.map((item) => [item.name, item.value]));
+    const group = svg('g');
+
+    const cell = (x, y, w, h, label, value, text) => {
+      const level = core.heatLevel(value, max, 4);
+      group.append(
+        svg('rect', {
+          x,
+          y,
+          width: Math.max(1, w - 4),
+          height: Math.max(1, h - 4),
+          rx: 5,
+          class: 'chart-slice',
+          'stroke-width': 0,
+          style: 'fill:' + color + ';fill-opacity:' + LEVEL_OPACITY[level],
+          onmousemove: (event) =>
+            ctx.tip.show(event, label, [{ color, label: 'Total', value: ctx.format(value) }]),
+        }),
+        svg(
+          'text',
+          {
+            x: x + (w - 4) / 2,
+            y: y + (h - 4) / 2 + 4,
+            'text-anchor': 'middle',
+            class: 'chart-label',
+          },
+          text,
+        ),
+      );
+    };
+
+    if (/^\d{4}-\d{2}$/.test(spec.month || '')) {
+      const weeks = core.calendarGrid(spec.month);
+      const cw = Math.min(plotW / 7, 84);
+      const ch = Math.min((plotH - 18) / weeks.length, 52);
+      const left = m.left + (plotW - cw * 7) / 2;
+      ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'].forEach((letter, column) =>
+        group.append(
+          svg(
+            'text',
+            {
+              x: left + cw * column + cw / 2,
+              y: m.top + 10,
+              'text-anchor': 'middle',
+              class: 'chart-tick',
+            },
+            letter,
+          ),
+        ),
+      );
+      weeks.forEach((week, row) =>
+        week.forEach((day, column) => {
+          if (day) {
+            cell(
+              left + cw * column,
+              m.top + 18 + ch * row,
+              cw,
+              ch,
+              'Dia ' + day,
+              byName.get(String(day)) || 0,
+              day,
+            );
+          }
+        }),
+      );
+    } else {
+      const count = entities.length;
+      const columns = Math.ceil(Math.sqrt(count));
+      const rows = Math.ceil(count / columns);
+      const cw = Math.min(plotW / columns, 120);
+      const ch = Math.min(plotH / rows, 64);
+      const left = m.left + (plotW - cw * columns) / 2;
+      entities.forEach((item, index) =>
+        cell(
+          left + cw * (index % columns),
+          m.top + ch * Math.floor(index / columns),
+          cw,
+          ch,
+          item.name,
+          item.value,
+          clip(item.name, Math.max(4, Math.floor(cw / 7))),
+        ),
+      );
+    }
+    ctx.root.append(group);
+  }
+
   const edge = { top: 16, right: 16, bottom: 16, left: 16 };
 
   charts.register('polar', {
@@ -153,5 +325,18 @@
     noLegend: true,
     margin: edge,
     draw: drawTreemap,
+  });
+  charts.register('waterfall', {
+    label: 'Cascata',
+    slices: true,
+    noLegend: true,
+    draw: drawWaterfall,
+  });
+  charts.register('heatmap', {
+    label: 'Mapa de calor',
+    slices: true,
+    noLegend: true,
+    margin: edge,
+    draw: drawHeatmap,
   });
 })();
