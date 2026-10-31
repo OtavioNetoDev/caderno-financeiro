@@ -35,6 +35,9 @@
     profit: 'var(--series-7)',
   };
 
+  // "2026-10-05" -> "2026-10" (o mapa de calor usa o mês para montar o calendário).
+  const monthOf = (days) => (days && days.length ? days[0].slice(0, 7) : undefined);
+
   const ALL_TYPES = [
     'bar',
     'stacked',
@@ -47,6 +50,8 @@
     'polar',
     'funnel',
     'treemap',
+    'waterfall',
+    'heatmap',
   ];
 
   // Ordena do maior para o menor e agrupa o excedente em "Outros" (a paleta tem 8 cores).
@@ -88,6 +93,27 @@
         };
       },
     },
+    monthBridge: {
+      label: 'Para onde vai o dinheiro (cascata)',
+      periods: [1, 3, 6, 12],
+      defaultPeriod: 1,
+      defaultType: 'waterfall',
+      url: (month, period) => `/reports/monthly?end=${month}&months=${period}`,
+      toSpec(data) {
+        const sum = (list) => list.reduce((total, value) => total + value, 0);
+        return {
+          categoryLabel: 'Etapa',
+          valueLabel: 'Movimento',
+          categories: ['Receitas', 'Despesas', 'Aportes'],
+          series: [
+            {
+              name: 'Movimento',
+              values: [sum(data.income), -sum(data.expense), -sum(data.investment)],
+            },
+          ],
+        };
+      },
+    },
     daily: {
       label: 'Movimento dia a dia do mês',
       periods: [1],
@@ -97,6 +123,7 @@
       toSpec(data) {
         return {
           categoryLabel: 'Dia',
+          month: monthOf(data.days),
           categories: data.days.map((day) => String(Number(day.slice(8)))),
           series: [
             { name: 'Receitas', values: data.income, color: COLORS.income },
@@ -117,6 +144,7 @@
         const expense = core.cumulative(data.expense);
         return {
           categoryLabel: 'Dia',
+          month: monthOf(data.days),
           categories: data.days.map((day) => String(Number(day.slice(8)))),
           series: [
             { name: 'Receitas', values: income, color: COLORS.income },

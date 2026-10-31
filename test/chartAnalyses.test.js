@@ -116,3 +116,35 @@ test('patrimônio usa os saldos já carregados, sem chamar a API', () => {
   assert.strictEqual(spec.categories[0], 'Nubank');
   assert.deepStrictEqual(ANALYSES.netWorth.local({}), []);
 });
+
+test('monthBridge soma o período e trata despesas e aportes como saídas', () => {
+  const spec = ANALYSES.monthBridge.toSpec({
+    income: [1000, 500],
+    expense: [300, 200],
+    investment: [100, 50],
+  });
+  assert.deepStrictEqual(spec.categories, ['Receitas', 'Despesas', 'Aportes']);
+  assert.deepStrictEqual(spec.series[0].values, [1500, -500, -150]);
+  assert.strictEqual(ANALYSES.monthBridge.defaultType, 'waterfall');
+  assert.strictEqual(
+    ANALYSES.monthBridge.url('2026-10', 3),
+    '/reports/monthly?end=2026-10&months=3',
+  );
+});
+
+test('as análises diárias informam o mês para o mapa de calor', () => {
+  const data = {
+    days: ['2026-10-01', '2026-10-02'],
+    income: [1, 2],
+    expense: [3, 4],
+    investment: [0, 0],
+  };
+  assert.strictEqual(ANALYSES.daily.toSpec(data).month, '2026-10');
+  assert.strictEqual(ANALYSES.cumulative.toSpec(data).month, '2026-10');
+});
+
+test('o catálogo oferece os tipos de gráfico novos', () => {
+  for (const type of ['polar', 'funnel', 'treemap', 'waterfall', 'heatmap']) {
+    assert.ok(ALL_TYPES.includes(type), type);
+  }
+});
