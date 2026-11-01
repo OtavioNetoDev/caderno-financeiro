@@ -115,6 +115,21 @@
         },
       });
 
+    const themeLabel = () => (CF.theme.current() === 'escuro' ? 'Tema claro' : 'Tema escuro');
+    const themeToggle = el(
+      'button',
+      {
+        class: 'btn small ghost',
+        type: 'button',
+        title: 'Alternar entre tema claro e escuro',
+        onclick: () => {
+          CF.theme.toggle();
+          themeToggle.textContent = themeLabel();
+        },
+      },
+      themeLabel(),
+    );
+
     const topbar = el(
       'header',
       { class: 'topbar' },
@@ -123,6 +138,7 @@
         'div',
         { class: 'topbar-actions' },
         month,
+        themeToggle,
         el('span', { class: 'avatar', title: state.user.name }, initials(state.user.name)),
         el('button', { class: 'btn small ghost', type: 'button', onclick: logout }, 'Sair'),
       ),
