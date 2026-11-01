@@ -308,7 +308,7 @@
               'div',
               { class: 'chart-tools' },
               toggle,
-              CF.chartExport.button(() => stage.querySelector('svg'), spec.title),
+              CF.chartExport?.button(() => stage.querySelector('svg'), spec.title),
             )
           : null,
       ),
