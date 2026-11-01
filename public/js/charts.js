@@ -303,7 +303,14 @@
         'figcaption',
         { class: 'chart-head' },
         el('strong', {}, spec.title || ''),
-        hasData ? toggle : null,
+        hasData
+          ? el(
+              'div',
+              { class: 'chart-tools' },
+              toggle,
+              CF.chartExport.button(() => stage.querySelector('svg'), spec.title),
+            )
+          : null,
       ),
       legend,
       stage,

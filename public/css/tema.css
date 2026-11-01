@@ -300,3 +300,10 @@ select:focus {
     transition: none !important;
   }
 }
+
+/* Botões no topo de cada gráfico (tabela e imagem). */
+.chart-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
