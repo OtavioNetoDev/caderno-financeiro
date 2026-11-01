@@ -209,3 +209,29 @@ body:has(.auth) {
     margin-right: auto;
   }
 }
+
+/* Ícones do menu lateral. */
+.nav a {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+}
+
+.icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  opacity: 0.8;
+  transition:
+    color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.nav a:hover .icon,
+.nav a.active .icon {
+  opacity: 1;
+}
+
+.nav a.active .icon {
+  color: var(--gold);
+}

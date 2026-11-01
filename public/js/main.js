@@ -75,7 +75,12 @@
     const links = Object.entries(views)
       .sort((a, b) => a[1].order - b[1].order)
       .map(([name, item]) =>
-        el('a', { href: '#/' + name, class: name === key ? 'active' : '' }, item.title),
+        el(
+          'a',
+          { href: '#/' + name, class: name === key ? 'active' : '' },
+          CF.icon(name),
+          el('span', {}, item.title),
+        ),
       );
 
     const sidebar = el(
