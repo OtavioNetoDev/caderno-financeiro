@@ -44,7 +44,7 @@ Para usar em outro computador: `git clone`, `npm install`, criar o `.env` com a 
   dia da semana e patrimônio) em 13 tipos de gráfico à escolha (colunas, empilhadas, barras
   horizontais, linhas, área, pizza, rosca, radar, área polar, funil, treemap, cascata e mapa de calor),
   com legenda, dica ao passar o mouse e visão em tabela. Até 6 gráficos ao mesmo tempo, salvos no
-  navegador.
+  navegador, e cada um pode ser baixado como imagem PNG.
 - **Lançamentos:** receitas, despesas, investimentos e transferências entre contas, com edição, lixeira,
   observações, status pendente e campo "com/de" uma pessoa. A lista tem busca (sem diferenciar acento
   ou maiúscula) e filtros por tipo, status e categoria, com os totais do que está filtrado.
@@ -61,6 +61,11 @@ Para usar em outro computador: `git clone`, `npm install`, criar o `.env` com a 
 - **Cadastros:** contas e categorias (criar, renomear, arquivar e excluir).
 - **Exportar:** CSV de lançamentos (protegido contra injeção de fórmulas), backup completo em JSON (com os
   recorrentes) e restauração de backup com prévia antes de gravar.
+
+## Aparência
+
+Tema azul escuro com imagem de fundo e menu lateral em vidro, tema claro opcional (botão na barra
+superior), ícones no menu e animações suaves. Detalhes em [docs/visual.md](docs/visual.md).
 
 ## Segurança
 
