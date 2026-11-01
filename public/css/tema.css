@@ -187,12 +187,9 @@ h2 {
   letter-spacing: -0.01em;
 }
 
-/* Tela de login: a imagem inteira de fundo e o cartão no espaço vazio da lateral. */
+/* Tela de login: fundo azul liso (sem a imagem) e cartão em destaque. */
 body:has(.auth) {
-  background:
-    linear-gradient(90deg, rgba(3, 11, 29, 0.35), rgba(3, 11, 29, 0)),
-    url('/img/fundo.png') right bottom / cover no-repeat fixed,
-    var(--page);
+  background: linear-gradient(135deg, var(--navy), var(--navy-2));
 }
 
 .auth {
@@ -201,13 +198,6 @@ body:has(.auth) {
   background: var(--surface-solid);
   border-radius: 14px;
   box-shadow: var(--shadow), var(--glow);
-}
-
-@media (min-width: 1000px) {
-  .auth {
-    margin-left: clamp(2rem, 7vw, 8rem);
-    margin-right: auto;
-  }
 }
 
 /* Ícones do menu lateral. */

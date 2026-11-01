@@ -78,7 +78,7 @@
         el(
           'a',
           { href: '#/' + name, class: name === key ? 'active' : '' },
-          CF.icon(name),
+          CF.icon ? CF.icon(name) : null,
           el('span', {}, item.title),
         ),
       );
