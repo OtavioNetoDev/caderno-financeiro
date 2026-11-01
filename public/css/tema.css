@@ -186,3 +186,26 @@ h1,
 h2 {
   letter-spacing: -0.01em;
 }
+
+/* Tela de login: a imagem inteira de fundo e o cartão no espaço vazio da lateral. */
+body:has(.auth) {
+  background:
+    linear-gradient(90deg, rgba(3, 11, 29, 0.35), rgba(3, 11, 29, 0)),
+    url('/img/fundo.png') right bottom / cover no-repeat fixed,
+    var(--page);
+}
+
+.auth {
+  max-width: 420px;
+  padding: 1.6rem;
+  background: var(--surface-solid);
+  border-radius: 14px;
+  box-shadow: var(--shadow), var(--glow);
+}
+
+@media (min-width: 1000px) {
+  .auth {
+    margin-left: clamp(2rem, 7vw, 8rem);
+    margin-right: auto;
+  }
+}
