@@ -1,0 +1,88 @@
+/* Tema azul escuro sobre a imagem de fundo (padrão) e tema claro opcional. */
+:root,
+:root[data-theme='escuro'] {
+  color-scheme: dark;
+  --page: #030b1d;
+  --bg: rgba(255, 255, 255, 0.06);
+  --surface: rgba(8, 20, 46, 0.74);
+  --surface-solid: #0c1a36;
+  --text: #e8eefb;
+  --muted: #9db0cf;
+  --border: rgba(140, 180, 255, 0.18);
+  --primary: #5aa2ff;
+  --accent: #3b82f6;
+  --income: #4ade80;
+  --expense: #f87171;
+  --investment: #38bdf8;
+  --glow: 0 0 24px rgba(59, 130, 246, 0.3);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --blur: blur(14px) saturate(140%);
+  --sidebar-bg: rgba(3, 11, 29, 0.72);
+  --btn-primary: linear-gradient(135deg, #1d4ed8, #3b82f6);
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-5: #d55181;
+  --series-6: #008300;
+  --series-7: #9085e9;
+  --series-8: #e66767;
+}
+
+:root[data-theme='claro'] {
+  color-scheme: light;
+  --page: #eef1f6;
+  --bg: #eef1f6;
+  --surface: rgba(255, 255, 255, 0.92);
+  --surface-solid: #ffffff;
+  --text: #16212e;
+  --muted: #5f6b7a;
+  --border: #dbe1ea;
+  --primary: #1d4ed8;
+  --accent: #1d4ed8;
+  --income: #117a4d;
+  --expense: #b42318;
+  --investment: #0369a1;
+  --glow: 0 0 0 transparent;
+  --shadow: 0 1px 2px rgba(11, 37, 69, 0.06), 0 6px 18px rgba(11, 37, 69, 0.08);
+  --blur: none;
+  --sidebar-bg: linear-gradient(180deg, #0b2545, #13315c);
+  --btn-primary: #13315c;
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --series-4: #eda100;
+  --series-5: #e87ba4;
+  --series-6: #008300;
+  --series-7: #6250d6;
+  --series-8: #e34948;
+}
+
+body {
+  background-color: var(--page);
+  background-image: url('/img/fundo.png');
+  background-repeat: no-repeat;
+  background-position: right bottom;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+/* No tema claro a imagem fica só como uma textura discreta. */
+:root[data-theme='claro'] body {
+  background-image:
+    linear-gradient(rgba(238, 241, 246, 0.94), rgba(238, 241, 246, 0.94)), url('/img/fundo.png');
+}
+
+.btn.primary {
+  background: var(--btn-primary);
+  border-color: transparent;
+}
+
+.chart-tip {
+  background: var(--surface-solid);
+}
+
+option {
+  color: var(--text);
+  background: var(--surface-solid);
+}
