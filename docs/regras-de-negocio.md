@@ -60,6 +60,9 @@ Nomes e valores usados como exemplo são fictícios.
 - **RN29:** Total recebido = proventos mais os ganhos dos resgates.
 - **RN30:** O rendimento diário, semanal e mensal usa taxas equivalentes de juros compostos a partir da taxa anual (365 dias por ano). A projeção de 1 a 100 anos aplica juros mensais e aportes ao fim de cada mês, sem impostos nem inflação.
 - **RN33:** A tela Proventos lista os proventos de todos os investimentos por período (mês e últimos 12 meses). Eles vêm das movimentações do tipo provento, não são lançamentos e por isso não entram em receitas, lucro nem percentual investido.
+- **RN34:** O retorno de um investimento é o provento recebido no período dividido pelo valor investido (aportes menos resgates) até o fim do período. Proventos de investimentos de outras pessoas ficam fora dos totais e do retorno, e aparecem só como aviso separado.
+- **RN35:** O rendimento estimado de um investimento usa, nesta ordem: o ganho por dia útil informado (semana = 5 dias, mês = 21, ano = 252), a taxa anual informada (juros compostos) ou, em ações, fundos imobiliários e fundos sem taxa, os proventos dos últimos 12 meses.
+- **RN36:** Investimento com "De quem é?" preenchido (sobrinho, mãe...) não entra no meu saldo, rendimento nem proventos; o resumo mostra um total separado por pessoa.
 
 ## 7. Sessão e senha
 
