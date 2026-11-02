@@ -59,6 +59,7 @@ Nomes e valores usados como exemplo são fictícios.
 - **RN28:** Saldo aplicado = aportes menos resgates, nunca negativo. Resgatar mais do que foi aplicado gera ganho recebido.
 - **RN29:** Total recebido = proventos mais os ganhos dos resgates.
 - **RN30:** O rendimento diário, semanal e mensal usa taxas equivalentes de juros compostos a partir da taxa anual (365 dias por ano). A projeção de 1 a 100 anos aplica juros mensais e aportes ao fim de cada mês, sem impostos nem inflação.
+- **RN33:** A tela Proventos lista os proventos de todos os investimentos por período (mês e últimos 12 meses). Eles vêm das movimentações do tipo provento, não são lançamentos e por isso não entram em receitas, lucro nem percentual investido.
 
 ## 7. Sessão e senha
 

@@ -55,6 +55,7 @@ Para usar em outro computador: `git clone`, `npm install`, criar o `.env` com a 
   (as compras entram no resumo e nas metas por categoria; o pagamento da fatura não conta duas vezes).
 - **Dívidas:** valores a receber e a pagar, com pagamentos, aumentos e histórico.
 - **Investimentos:** aportes, resgates e proventos, com rendimento estimado por dia, semana e mês.
+- **Proventos:** tela própria para anotar o que os investimentos pagam (dividendos, juros, rendimentos), com resumo do mês e dos últimos 12 meses, lista, cadastro rápido e 3 gráficos de tipo à escolha. Ficam separados das receitas.
 - **Simulador:** projeção de 1 a 100 anos com juros compostos e aportes mensais.
 - **Metas:** limite mensal por categoria, com alertas.
 - **Notas:** observações por mês.
@@ -89,7 +90,7 @@ Todos exigem `Authorization: Bearer <token>`, exceto `/health` e `/auth/*` (meno
 | `/transactions`                                                                                                        | CRUD de lançamentos, com filtros `type`, `status`, `categoryId`, `accountId`, `from`, `to`, `page` e `limit` |
 | `GET /transactions/summary?month=AAAA-MM`                                                                              | Resumo do mês                                                                                                |
 | `/debts`                                                                                                               | Dívidas, com `POST /debts/:id/entries` e `GET /debts/summary`                                                |
-| `/investments`                                                                                                         | Investimentos, com `/entries` e `GET /investments/summary`                                                   |
+| `/investments`                                                                                                         | Investimentos, com `/entries`, `GET /investments/summary` e `GET /investments/income?from=&to=`              |
 | `/cards`                                                                                                               | Cartões, compras em `/charges` e faturas em `/invoices/:month` (com `PUT` e `/pay`)                          |
 | `GET /budgets/status?month=AAAA-MM`, `PUT /budgets/:categoryId`                                                        | Metas por categoria                                                                                          |
 | `/notes`                                                                                                               | Notas por mês                                                                                                |
