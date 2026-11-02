@@ -179,6 +179,81 @@
     );
   }
 
+  // Cada gráfico tem seu seletor de tipo; a escolha fica salva neste navegador.
+  function chartCard(title, key, fallbackType, spec) {
+    const types = CF.analyses.ALL_TYPES;
+    const storageKey = 'cf_proventos_' + key;
+    let type = fallbackType;
+    try {
+      const saved = localStorage.getItem(storageKey);
+      type = types.includes(saved) ? saved : fallbackType;
+    } catch {
+      // Sem armazenamento (janela privada): a escolha só vale nesta tela.
+    }
+    const host = el('div');
+    const draw = () => {
+      host.replaceChildren();
+      CF.charts.render(host, { ...spec, type, title });
+    };
+    const select = el(
+      'select',
+      {
+        'aria-label': 'Tipo de gráfico',
+        onchange: (event) => {
+          type = event.target.value;
+          try {
+            localStorage.setItem(storageKey, type);
+          } catch {
+            // Sem armazenamento: a escolha só vale nesta tela.
+          }
+          draw();
+        },
+      },
+      types.map((item) =>
+        el('option', { value: item, selected: item === type }, CF.charts.types[item].label),
+      ),
+    );
+    draw();
+    return el(
+      'section',
+      { class: 'card chart-card' },
+      el('div', { class: 'chart-controls' }, select),
+      host,
+    );
+  }
+
+  const rankingOf = (list) =>
+    CF.chartsCore.foldOther(list.map((item) => ({ label: item.name, value: item.total })));
+
+  function chartGrid(monthReport, yearReport, month) {
+    const months = lastMonths(month, 12);
+    const totals = new Map(yearReport.byMonth.map((item) => [item.month, item.total]));
+    const monthRanking = rankingOf(monthReport.byInvestment);
+    const yearRanking = rankingOf(yearReport.byInvestment);
+    return el(
+      'div',
+      { class: 'chart-grid' },
+      chartCard('Proventos por investimento (mês)', 'mes', 'donut', {
+        ariaLabel: 'Proventos por investimento no mês',
+        categories: monthRanking.map((item) => item.label),
+        series: [{ name: 'Proventos', values: monthRanking.map((item) => item.value) }],
+        emptyText: 'Nenhum provento neste mês.',
+      }),
+      chartCard('Proventos por mês (12 meses)', 'evolucao', 'bar', {
+        ariaLabel: 'Proventos recebidos por mês nos últimos 12 meses',
+        categories: months.map(CF.analyses.monthLabel),
+        series: [{ name: 'Proventos', values: months.map((item) => totals.get(item) || 0) }],
+        emptyText: 'Nenhum provento nos últimos 12 meses.',
+      }),
+      chartCard('Proventos por investimento (12 meses)', 'ano', 'hbar', {
+        ariaLabel: 'Proventos por investimento nos últimos 12 meses',
+        categories: yearRanking.map((item) => item.label),
+        series: [{ name: 'Proventos', values: yearRanking.map((item) => item.value) }],
+        emptyText: 'Nenhum provento nos últimos 12 meses.',
+      }),
+    );
+  }
+
   async function render(container, state, reload) {
     let investments;
     let monthReport;
@@ -200,7 +275,8 @@
     const summary = summaryCard(monthReport, yearReport);
     const form = entryForm(investments, state, reload);
     const list = listCard(monthReport, reload);
-    const sections = [summary, form, list];
+    const charts = chartGrid(monthReport, yearReport, state.month);
+    const sections = [summary, form, charts, list];
     container.replaceChildren(...sections);
   }
 
