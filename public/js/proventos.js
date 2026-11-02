@@ -66,7 +66,13 @@
     const asset = el(
       'select',
       { 'aria-label': 'Investimento' },
-      ...investments.map((item) => el('option', { value: item._id }, item.name)),
+      ...investments.map((item) =>
+        el(
+          'option',
+          { value: item._id },
+          item.personName ? item.name + ' (de ' + item.personName + ')' : item.name,
+        ),
+      ),
     );
     const amount = el('input', {
       type: 'text',
@@ -254,6 +260,78 @@
     );
   }
 
+  const pct = (value) => value.toLocaleString('pt-BR', { maximumFractionDigits: 2 }) + '%';
+
+  // Retorno = provento recebido sobre o valor investido até o fim do mês escolhido.
+  function returnsCard(monthReport, yearReport) {
+    const yearById = new Map(yearReport.returns.map((item) => [String(item.investmentId), item]));
+    const rows = monthReport.returns.map((item) => {
+      const year = yearById.get(String(item.investmentId));
+      return el(
+        'tr',
+        {},
+        el('td', {}, item.name),
+        el('td', { class: 'num' }, fmt(item.invested)),
+        el('td', { class: 'num' }, fmt(item.received)),
+        el('td', { class: 'num' }, pct(item.percent)),
+        el('td', { class: 'num' }, year ? pct(year.percent) : '—'),
+      );
+    });
+    return el(
+      'section',
+      { class: 'card' },
+      el('h2', {}, 'Retorno sobre o que você investiu'),
+      el(
+        'p',
+        { class: 'muted' },
+        'Quanto cada investimento pagou em relação ao valor aplicado nele. O valor investido vem dos aportes que você registra na tela Investimentos.',
+      ),
+      rows.length
+        ? el(
+            'div',
+            { class: 'table-wrap' },
+            el(
+              'table',
+              {},
+              el(
+                'thead',
+                {},
+                el(
+                  'tr',
+                  {},
+                  el('th', {}, 'Investimento'),
+                  el('th', { class: 'num' }, 'Investido'),
+                  el('th', { class: 'num' }, 'Recebido no mês'),
+                  el('th', { class: 'num' }, 'Retorno no mês'),
+                  el('th', { class: 'num' }, 'Retorno em 12 meses'),
+                ),
+              ),
+              el('tbody', {}, ...rows),
+            ),
+          )
+        : el(
+            'p',
+            { class: 'muted' },
+            'Registre um aporte na tela Investimentos para ver o retorno.',
+          ),
+    );
+  }
+
+  // Proventos de outras pessoas ficam de fora dos seus totais; aqui só um aviso separado.
+  function othersNote(monthReport) {
+    if (!monthReport.others.length) {
+      return null;
+    }
+    const text = monthReport.others
+      .map((item) => item.personName + ' ' + fmt(item.total))
+      .join(' · ');
+    return el(
+      'p',
+      { class: 'notice' },
+      'Recebido por outras pessoas neste mês (não entra nos seus totais): ' + text,
+    );
+  }
+
   async function render(container, state, reload) {
     let investments;
     let monthReport;
@@ -276,7 +354,9 @@
     const form = entryForm(investments, state, reload);
     const list = listCard(monthReport, reload);
     const charts = chartGrid(monthReport, yearReport, state.month);
-    const sections = [summary, form, charts, list];
+    const returns = returnsCard(monthReport, yearReport);
+    const others = othersNote(monthReport);
+    const sections = [summary, others, form, returns, charts, list].filter(Boolean);
     container.replaceChildren(...sections);
   }
 
