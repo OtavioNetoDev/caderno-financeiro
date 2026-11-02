@@ -63,32 +63,109 @@ function applyEntry(investment, entry) {
   return null;
 }
 
-function present(investment) {
-  const data = investment.toJSON ? investment.toJSON() : { ...investment };
-  const current = position(data.entries);
+const VARIABLE_TYPES = ['fii', 'stock', 'fund'];
+// Dias úteis: o Tesouro e os fundos rendem só em dia útil.
+const BUSINESS_DAYS = { week: 5, month: 21, year: 252 };
+const round2 = (value) => Math.round(value * 100) / 100;
+
+// Quanto o investimento rende, escolhendo o jeito certo de calcular:
+// - "daily": você informou quanto ganha por dia útil (ex.: Tesouro Selic sem saber a taxa);
+// - "rate": taxa anual informada (CDB, Tesouro, poupança...), com juros compostos;
+// - "income": ações, fundos imobiliários e fundos sem taxa: vale o que pagaram nos últimos 12 meses.
+function estimate(data, current) {
+  const balance = current.balance;
+  const annualRate = Number(data.annualRate) || 0;
+  const dailyGain = Number(data.dailyGain) || 0;
+
+  if (dailyGain > 0) {
+    const yearly = dailyGain * BUSINESS_DAYS.year;
+    return {
+      method: 'daily',
+      annualRate: balance > 0 ? round2((yearly / balance) * 100) : 0,
+      yields: {
+        daily: dailyGain,
+        weekly: dailyGain * BUSINESS_DAYS.week,
+        monthly: dailyGain * BUSINESS_DAYS.month,
+        yearly,
+      },
+    };
+  }
+
+  if (annualRate > 0 || !VARIABLE_TYPES.includes(data.type)) {
+    return {
+      method: 'rate',
+      annualRate,
+      yields: {
+        ...estimateYield(balance, annualRate),
+        yearly: Math.round((balance * annualRate) / 100),
+      },
+    };
+  }
+
+  const yearly = current.income12m;
   return {
-    ...data,
-    position: current,
-    yields: estimateYield(current.balance, data.annualRate || 0),
+    method: 'income',
+    annualRate: balance > 0 ? round2((yearly / balance) * 100) : 0,
+    yields: {
+      daily: Math.round(yearly / 365),
+      weekly: Math.round(yearly / 52),
+      monthly: Math.round(yearly / 12),
+      yearly,
+    },
   };
 }
 
+function present(investment) {
+  const data = investment.toJSON ? investment.toJSON() : { ...investment };
+  const current = position(data.entries);
+  const result = estimate(data, current);
+  return {
+    ...data,
+    position: current,
+    estimate: { method: result.method, annualRate: result.annualRate },
+    yields: result.yields,
+  };
+}
+
+const emptyTotals = () => ({
+  count: 0,
+  balance: 0,
+  received: 0,
+  yields: { daily: 0, weekly: 0, monthly: 0, yearly: 0 },
+});
+
+function addTo(total, current, yields) {
+  total.count += 1;
+  total.balance += current.balance;
+  total.received += current.received;
+  for (const key of Object.keys(total.yields)) {
+    total.yields[key] += yields[key];
+  }
+}
+
+// Totais da minha carteira. Investimentos de outras pessoas (sobrinho, mãe...) ficam em "others",
+// um total por pessoa, e não entram no meu saldo.
 function summarize(investments) {
-  const total = { count: 0, balance: 0, received: 0, yields: { daily: 0, weekly: 0, monthly: 0 } };
+  const total = emptyTotals();
+  const others = new Map();
   for (const investment of investments) {
     if (investment.archived) {
       continue;
     }
     const current = position(investment.entries);
-    const yields = estimateYield(current.balance, investment.annualRate || 0);
-    total.count += 1;
-    total.balance += current.balance;
-    total.received += current.received;
-    total.yields.daily += yields.daily;
-    total.yields.weekly += yields.weekly;
-    total.yields.monthly += yields.monthly;
+    const { yields } = estimate(investment, current);
+    const personName = String(investment.personName || '').trim();
+    if (!personName) {
+      addTo(total, current, yields);
+      continue;
+    }
+    const key = personName.toLowerCase();
+    if (!others.has(key)) {
+      others.set(key, { personName, ...emptyTotals() });
+    }
+    addTo(others.get(key), current, yields);
   }
-  return total;
+  return { ...total, others: [...others.values()].sort((a, b) => b.balance - a.balance) };
 }
 
 // Fuso America/Bahia (UTC-3): o mês de um provento segue o mesmo fuso do resto do sistema.
@@ -154,4 +231,4 @@ function incomeReport(investments, { from, to } = {}) {
   };
 }
 
-module.exports = { position, applyEntry, present, summarize, incomeReport };
+module.exports = { position, applyEntry, present, summarize, incomeReport, estimate };
