@@ -3,8 +3,16 @@ const AppError = require('../utils/AppError');
 const pick = require('../utils/pick');
 const { applyEntry, present, summarize, incomeReport } = require('../services/investmentService');
 
-const CREATE_FIELDS = ['name', 'type', 'annualRate', 'notes'];
-const UPDATE_FIELDS = ['name', 'type', 'annualRate', 'notes', 'archived'];
+const CREATE_FIELDS = ['name', 'type', 'annualRate', 'dailyGain', 'personName', 'notes'];
+const UPDATE_FIELDS = [
+  'name',
+  'type',
+  'annualRate',
+  'dailyGain',
+  'personName',
+  'notes',
+  'archived',
+];
 
 async function findOwned(req) {
   const investment = await Investment.findOne({

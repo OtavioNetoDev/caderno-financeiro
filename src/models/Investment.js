@@ -37,6 +37,20 @@ const investmentSchema = new Schema(
       default: 0,
     },
     notes: { type: String, trim: true, maxlength: 300, default: '' },
+    // Vazio = investimento meu. Preenchido = de outra pessoa (sobrinho, mãe...), fora da minha carteira.
+    personName: {
+      type: String,
+      trim: true,
+      maxlength: [60, 'Nome da pessoa muito longo'],
+      default: '',
+    },
+    // Quanto rende por dia útil (centavos). Para quando não se sabe a taxa, como no Tesouro Selic.
+    dailyGain: {
+      type: Number,
+      min: [0, 'O ganho por dia não pode ser negativo'],
+      validate: isCents,
+      default: 0,
+    },
     archived: { type: Boolean, default: false },
     entries: [entrySchema],
     deletedAt: { type: Date, default: null },
