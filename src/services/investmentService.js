@@ -1,23 +1,54 @@
 const { estimateYield } = require('../../public/js/projection');
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+const round6 = (value) => Math.round(value * 1e6) / 1e6;
+
 // Posição do investimento a partir das movimentações (valores aproximados, sem marcação a mercado).
-function position(entries = []) {
+// Cotas: aportes com cotas somam, resgates com cotas subtraem. Preço médio = valor pago / cotas compradas.
+function position(entries = [], now = new Date()) {
+  const since = new Date(now).getTime() - 365 * DAY_MS;
+  const until = new Date(now).getTime();
   let contributed = 0;
   let redeemed = 0;
   let income = 0;
+  let income12m = 0;
+  let bought = 0;
+  let sold = 0;
+  let paidForBought = 0;
   for (const entry of entries) {
+    const quantity = Number(entry.quantity) > 0 ? Number(entry.quantity) : 0;
     if (entry.kind === 'contribution') {
       contributed += entry.amount;
+      bought += quantity;
+      if (quantity) {
+        paidForBought += entry.amount;
+      }
     } else if (entry.kind === 'redemption') {
       redeemed += entry.amount;
+      sold += quantity;
     } else if (entry.kind === 'income') {
       income += entry.amount;
+      const when = new Date(entry.date).getTime();
+      if (when >= since && when <= until) {
+        income12m += entry.amount;
+      }
     }
   }
   const balance = Math.max(contributed - redeemed, 0);
   // Resgatar mais do que foi aplicado gera ganho realizado.
   const realizedGain = Math.max(redeemed - contributed, 0);
-  return { contributed, redeemed, income, balance, received: income + realizedGain };
+  const quantity = round6(Math.max(bought - sold, 0));
+  return {
+    contributed,
+    redeemed,
+    income,
+    income12m,
+    balance,
+    received: income + realizedGain,
+    quantity,
+    averagePrice: bought > 0 ? Math.round(paidForBought / bought) : null,
+    incomePerShare12m: quantity > 0 ? Math.round(income12m / quantity) : null,
+  };
 }
 
 // Registra uma movimentação. Devolve uma mensagem de erro ou null.
