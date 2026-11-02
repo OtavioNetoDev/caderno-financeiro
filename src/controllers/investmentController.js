@@ -1,7 +1,7 @@
 const Investment = require('../models/Investment');
 const AppError = require('../utils/AppError');
 const pick = require('../utils/pick');
-const { applyEntry, present, summarize } = require('../services/investmentService');
+const { applyEntry, present, summarize, incomeReport } = require('../services/investmentService');
 
 const CREATE_FIELDS = ['name', 'type', 'annualRate', 'notes'];
 const UPDATE_FIELDS = ['name', 'type', 'annualRate', 'notes', 'archived'];
@@ -80,4 +80,30 @@ async function summary(req, res) {
   res.json(summarize(investments));
 }
 
-module.exports = { list, getOne, create, update, remove, addEntry, removeEntry, summary };
+// Proventos recebidos no período (?from=...&to=...), separados das receitas.
+async function income(req, res) {
+  const range = {};
+  for (const key of ['from', 'to']) {
+    if (req.query[key]) {
+      const date = new Date(req.query[key]);
+      if (Number.isNaN(date.getTime())) {
+        throw new AppError(400, 'Data inválida em "' + key + '"');
+      }
+      range[key] = date;
+    }
+  }
+  const investments = await Investment.find({ userId: req.userId, deletedAt: null });
+  res.json(incomeReport(investments, range));
+}
+
+module.exports = {
+  list,
+  getOne,
+  create,
+  update,
+  remove,
+  addEntry,
+  removeEntry,
+  summary,
+  income,
+};
