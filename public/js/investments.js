@@ -150,6 +150,60 @@
     );
   }
 
+  const DAILY_TYPES = ['treasury', 'reserve', 'fund', 'other'];
+  const HINTS = {
+    cdb: 'Informe a taxa anual do CDB (ex.: 11,5). O sistema calcula quanto rende por dia, semana, mês e ano.',
+    treasury:
+      'Informe a taxa anual. Se não souber (Tesouro Selic, por exemplo), informe quanto ele rende por dia útil: o sistema calcula semana, mês e ano.',
+    fii: 'O rendimento vem dos proventos que você registrar (dividendos). Informe as cotas em cada aporte. Se quiser, estime também com uma taxa anual.',
+    stock:
+      'O rendimento vem dos proventos que você registrar (dividendos e JCP). Informe as cotas em cada aporte. Se quiser, estime também com uma taxa anual.',
+    fund: 'Informe a taxa anual ou quanto rende por dia útil. Sem nenhum dos dois, vale a média dos proventos recebidos.',
+    savings:
+      'Informe a taxa anual da poupança. O sistema calcula quanto rende por dia, semana, mês e ano.',
+    reserve: 'Informe a taxa anual ou quanto o cofrinho rende por dia útil.',
+    other: 'Informe a taxa anual ou quanto rende por dia útil.',
+  };
+  const METHOD_LABELS = {
+    rate: 'pela taxa informada',
+    daily: 'pelo ganho por dia útil',
+    income: 'pelos proventos (12 meses)',
+  };
+
+  const pct = (value) => value.toLocaleString('pt-BR', { maximumFractionDigits: 2 }) + '%';
+
+  // Nome, tipo, dono e, quando há cotas, quantidade e preço médio.
+  function nameCell(investment) {
+    const details = [TYPES[investment.type]];
+    if (investment.personName) {
+      details.push('de ' + investment.personName);
+    }
+    const { quantity, averagePrice } = investment.position;
+    if (quantity > 0) {
+      details.push(quantity.toLocaleString('pt-BR') + ' cotas');
+      if (averagePrice) {
+        details.push('preço médio ' + fmt(averagePrice));
+      }
+    }
+    return el(
+      'td',
+      {},
+      el('strong', {}, investment.name),
+      el('div', { class: 'muted' }, details.join(' · ')),
+    );
+  }
+
+  // Taxa ao ano e de onde ela vem (informada, ganho por dia ou proventos).
+  function rateCell(investment) {
+    const { method, annualRate } = investment.estimate;
+    return el(
+      'td',
+      { class: 'num' },
+      pct(annualRate),
+      el('div', { class: 'muted' }, METHOD_LABELS[method]),
+    );
+  }
+
   async function render(container) {
     let items;
     let summary;
@@ -161,6 +215,7 @@
     }
     const redraw = () => render(container);
 
+    const owners = [...new Set(items.map((item) => item.personName).filter(Boolean))];
     const name = el('input', {
       type: 'text',
       placeholder: 'Nome (ex.: CDB banco X, MXRF11)',
@@ -175,10 +230,34 @@
     const rate = el('input', {
       type: 'text',
       inputmode: 'decimal',
-      placeholder: 'Taxa anual estimada (% a.a.)',
-      value: '10',
+      placeholder: 'Taxa anual (% a.a.)',
     });
+    const daily = el('input', {
+      type: 'text',
+      inputmode: 'decimal',
+      placeholder: 'Ganho por dia útil (R$)',
+    });
+    const person = el('input', {
+      type: 'text',
+      maxlength: 60,
+      placeholder: 'De quem é? (vazio = meu)',
+      list: 'cf-donos',
+    });
+    const ownersList = el(
+      'datalist',
+      { id: 'cf-donos' },
+      ...owners.map((n) => el('option', { value: n })),
+    );
+    const hint = el('p', { class: 'muted full' });
     const error = el('p', { class: 'error', role: 'alert', hidden: true });
+
+    // Cada tipo mostra só os campos que fazem sentido e explica como o rendimento é calculado.
+    function syncFields() {
+      daily.hidden = !DAILY_TYPES.includes(type.value);
+      hint.textContent = HINTS[type.value];
+    }
+    type.addEventListener('change', syncFields);
+    syncFields();
 
     const form = el(
       'form',
@@ -187,16 +266,28 @@
         onsubmit: async (event) => {
           event.preventDefault();
           error.hidden = true;
-          const annualRate = Number(rate.value.replace(',', '.'));
+          const annualRate = rate.value.trim() ? Number(rate.value.replace(',', '.')) : 0;
           if (!Number.isFinite(annualRate) || annualRate < 0) {
             error.textContent = 'Informe uma taxa anual válida, como 10 ou 12,5';
+            error.hidden = false;
+            return;
+          }
+          const dailyGain = !daily.hidden && daily.value.trim() ? money.parseMoney(daily.value) : 0;
+          if (dailyGain === null) {
+            error.textContent = 'Informe o ganho por dia como valor, por exemplo 1,25';
             error.hidden = false;
             return;
           }
           try {
             await api('/investments', {
               method: 'POST',
-              body: { name: name.value, type: type.value, annualRate },
+              body: {
+                name: name.value,
+                type: type.value,
+                annualRate,
+                dailyGain: dailyGain || 0,
+                personName: person.value,
+              },
             });
             await redraw();
           } catch (err) {
@@ -207,7 +298,11 @@
       el('h2', {}, 'Novo investimento'),
       name,
       type,
+      hint,
       rate,
+      daily,
+      person,
+      ownersList,
       el('button', { class: 'btn primary full', type: 'submit' }, 'Cadastrar'),
       error,
     );
@@ -216,13 +311,8 @@
       const row = el(
         'tr',
         {},
-        el(
-          'td',
-          {},
-          el('strong', {}, investment.name),
-          el('div', { class: 'muted' }, TYPES[investment.type]),
-        ),
-        el('td', { class: 'num' }, investment.annualRate.toLocaleString('pt-BR') + '%'),
+        nameCell(investment),
+        rateCell(investment),
         el('td', { class: 'num' }, fmt(investment.position.balance)),
         el('td', { class: 'num income' }, fmt(investment.position.received)),
         el('td', { class: 'num' }, fmt(investment.yields.monthly)),
@@ -252,7 +342,7 @@
                 onclick: () => {
                   window.CF.simDefaults = {
                     initialCents: investment.position.balance,
-                    annualPercent: investment.annualRate,
+                    annualPercent: investment.estimate.annualRate,
                   };
                   location.hash = '#/simulator';
                 },
@@ -298,7 +388,7 @@
         el(
           'p',
           { class: 'muted' },
-          'Rendimentos estimados a partir da taxa anual informada (juros compostos), sem impostos. Total recebido = proventos + ganho dos resgates.',
+          'Rendimentos estimados, sem impostos. CDB, poupança e Tesouro usam a taxa anual; quando você informa o ganho por dia útil, ele vale mais que a taxa; ações e fundos imobiliários usam o que pagaram de proventos nos últimos 12 meses. Total recebido = proventos + ganho dos resgates.',
         ),
       ),
       form,
