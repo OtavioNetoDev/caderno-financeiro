@@ -51,6 +51,23 @@ const investmentSchema = new Schema(
       validate: isCents,
       default: 0,
     },
+    // Valor real que eu vi no app do banco (centavos) e a data dele. 0 = não informado, aí o sistema estima.
+    currentValue: {
+      type: Number,
+      min: [0, 'O valor atual não pode ser negativo'],
+      validate: isCents,
+      default: 0,
+    },
+    currentValueDate: { type: Date, default: null },
+    // Código na bolsa (MXRF11, VALE3). Vazio = tenta deduzir pelo nome.
+    ticker: { type: String, trim: true, uppercase: true, maxlength: 12, default: '' },
+    // Quanto cada cota paga de provento por mês, em centavos (10 = R$ 0,10).
+    monthlyIncomePerShare: {
+      type: Number,
+      min: [0, 'O provento por cota não pode ser negativo'],
+      validate: isCents,
+      default: 0,
+    },
     archived: { type: Boolean, default: false },
     entries: [entrySchema],
     deletedAt: { type: Date, default: null },

@@ -8,6 +8,7 @@ router.get('/', asyncHandler(controller.list));
 router.post('/', asyncHandler(controller.create));
 // "/summary" precisa vir antes de "/:id".
 router.get('/summary', asyncHandler(controller.summary));
+router.get('/portfolio', asyncHandler(controller.portfolio));
 router.get('/income', asyncHandler(controller.income));
 router.get('/:id', asyncHandler(controller.getOne));
 router.patch('/:id', asyncHandler(controller.update));

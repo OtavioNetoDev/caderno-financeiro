@@ -2,8 +2,26 @@ const Investment = require('../models/Investment');
 const AppError = require('../utils/AppError');
 const pick = require('../utils/pick');
 const { applyEntry, present, summarize, incomeReport } = require('../services/investmentService');
+const {
+  portfolio: buildPortfolio,
+  tickerOf,
+  MARKET_TYPES,
+} = require('../services/portfolioService');
+const { getQuotes } = require('../services/quotesService');
+const { getCdi } = require('../services/ratesService');
 
-const CREATE_FIELDS = ['name', 'type', 'annualRate', 'dailyGain', 'personName', 'notes'];
+const CREATE_FIELDS = [
+  'name',
+  'type',
+  'annualRate',
+  'dailyGain',
+  'personName',
+  'notes',
+  'currentValue',
+  'currentValueDate',
+  'ticker',
+  'monthlyIncomePerShare',
+];
 const UPDATE_FIELDS = [
   'name',
   'type',
@@ -11,6 +29,10 @@ const UPDATE_FIELDS = [
   'dailyGain',
   'personName',
   'notes',
+  'currentValue',
+  'currentValueDate',
+  'ticker',
+  'monthlyIncomePerShare',
   'archived',
 ];
 
@@ -104,7 +126,20 @@ async function income(req, res) {
   res.json(incomeReport(investments, range));
 }
 
+// Carteira por tipo: totais, valor atual estimado (CDI do Banco Central) e histórico.
+async function portfolio(req, res) {
+  const investments = await Investment.find({ userId: req.userId, deletedAt: null });
+  const rates = await getCdi();
+  const tickers = investments
+    .filter((item) => MARKET_TYPES.includes(item.type) && !item.archived && !item.personName)
+    .map((item) => tickerOf(item))
+    .filter(Boolean);
+  const quotes = await getQuotes(tickers);
+  res.json({ ...buildPortfolio(investments, { cdi: rates.annual, quotes }), cdi: rates });
+}
+
 module.exports = {
+  portfolio,
   list,
   getOne,
   create,
