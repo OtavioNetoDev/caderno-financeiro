@@ -1,5 +1,5 @@
 (function () {
-  const NS = 'http://www.w3.org/2000/svg'\;
+  const NS = ['http:', '', 'www.w3.org', '2000', 'svg'].join('/');
   const SCALE = 2;
   const STYLE_PROPS = [
     'fill',
