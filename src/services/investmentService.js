@@ -173,13 +173,22 @@ const BRAZIL_OFFSET_MS = 3 * 60 * 60 * 1000;
 const monthKey = (date) =>
   new Date(new Date(date).getTime() - BRAZIL_OFFSET_MS).toISOString().slice(0, 7);
 
-// Proventos recebidos no período (from/to opcionais), de todos os investimentos.
-// Ficam separados das receitas: vêm só das movimentações do tipo "income".
+// Proventos recebidos no período (from/to opcionais). Só entram os investimentos meus;
+// o que outras pessoas (sobrinho, mãe...) receberam vai separado em "others".
+// "returns" mostra, para cada investimento meu, quanto rendeu sobre o valor investido até o fim do período.
 function incomeReport(investments, { from, to } = {}) {
+  const until = to || new Date();
   const items = [];
+  const returns = [];
+  const others = new Map();
+
   for (const investment of investments) {
     const data = investment.toJSON ? investment.toJSON() : investment;
-    for (const entry of data.entries || []) {
+    const entries = data.entries || [];
+    const personName = String(data.personName || '').trim();
+
+    const received = [];
+    for (const entry of entries) {
       if (entry.kind !== 'income') {
         continue;
       }
@@ -187,6 +196,25 @@ function incomeReport(investments, { from, to } = {}) {
       if ((from && when < from) || (to && when > to)) {
         continue;
       }
+      received.push({ entry, when });
+    }
+
+    if (personName) {
+      const key = personName.toLowerCase();
+      const current = others.get(key) || { personName, total: 0, count: 0 };
+      for (const { entry } of received) {
+        current.total += entry.amount;
+        current.count += 1;
+      }
+      if (current.count) {
+        others.set(key, current);
+      }
+      continue;
+    }
+
+    let receivedTotal = 0;
+    for (const { entry, when } of received) {
+      receivedTotal += entry.amount;
       items.push({
         id: entry._id,
         investmentId: data._id,
@@ -198,8 +226,23 @@ function incomeReport(investments, { from, to } = {}) {
         notes: entry.notes || '',
       });
     }
+
+    if (!data.archived) {
+      const untilEntries = entries.filter((entry) => new Date(entry.date) <= until);
+      const invested = position(untilEntries, until).balance;
+      if (invested > 0) {
+        returns.push({
+          investmentId: data._id,
+          name: data.name,
+          invested,
+          received: receivedTotal,
+          percent: Math.round((receivedTotal / invested) * 10000) / 100,
+        });
+      }
+    }
   }
   items.sort((a, b) => b.date - a.date);
+  returns.sort((a, b) => b.invested - a.invested);
 
   const byInvestment = new Map();
   const byMonth = new Map();
@@ -224,6 +267,8 @@ function incomeReport(investments, { from, to } = {}) {
     total,
     count: items.length,
     items,
+    returns,
+    others: [...others.values()].sort((a, b) => b.total - a.total),
     byInvestment: [...byInvestment.values()].sort((a, b) => b.total - a.total),
     byMonth: [...byMonth.entries()]
       .sort((a, b) => a[0].localeCompare(b[0]))
