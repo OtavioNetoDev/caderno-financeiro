@@ -63,6 +63,9 @@ Nomes e valores usados como exemplo são fictícios.
 - **RN34:** O retorno de um investimento é o provento recebido no período dividido pelo valor investido (aportes menos resgates) até o fim do período. Proventos de investimentos de outras pessoas ficam fora dos totais e do retorno, e aparecem só como aviso separado.
 - **RN35:** O rendimento estimado de um investimento usa, nesta ordem: o ganho por dia útil informado (semana = 5 dias, mês = 21, ano = 252), a taxa anual informada (juros compostos) ou, em ações, fundos imobiliários e fundos sem taxa, os proventos dos últimos 12 meses.
 - **RN36:** Investimento com "De quem é?" preenchido (sobrinho, mãe...) não entra no meu saldo, rendimento nem proventos; o resumo mostra um total separado por pessoa.
+- **RN37:** O valor atual estimado de um investimento faz cada aporte e resgate render juros compostos desde a sua data. A taxa usada é, nesta ordem: o ganho por dia útil informado (convertido em taxa anual), a taxa anual informada, nenhuma taxa para ações e fundos imobiliários (valem pelo custo) ou o CDI do Banco Central para os demais. Se você informar o "valor real" visto no app do banco com a data dele, esse valor vira o ponto de partida e só contam as movimentações posteriores.
+- **RN38:** Ações e fundos imobiliários mostram a cotação de mercado (guardada por 15 minutos), a variação do dia, a diferença entre a cotação e o preço médio e os proventos por mês (cotas vezes o provento por cota informado). O código na bolsa vem do campo ticker ou é deduzido do nome, como MXRF11.
+- **RN39:** A carteira agrupa por tipo (poupança e cofrinho ficam juntos) e deixa de fora investimentos arquivados e de outras pessoas. O CDI fica guardado por 6 horas; sem internet o sistema usa o último valor conhecido e, se não houver nenhum, estima pelo custo.
 
 ## 7. Sessão e senha
 
