@@ -1,3 +1,5 @@
+const { describePurchase } = require('../../public/js/cardNotes');
+
 const MONTH_RE = /^\d{4}-(0[1-9]|1[0-2])$/;
 const MAX_INSTALLMENTS = 48;
 
@@ -45,7 +47,7 @@ function installmentsOf(charge, closingDay) {
   }));
 }
 
-function buildInvoice(charges, closingDay, month) {
+function buildInvoice(charges, closingDay, month, dueDay) {
   const items = [];
   for (const charge of charges) {
     for (const part of installmentsOf(charge, closingDay)) {
@@ -59,6 +61,16 @@ function buildInvoice(charges, closingDay, month) {
           number: part.number,
           of: part.of,
           amount: part.amount,
+          // Observação: mês da compra, vencimento e mês em que conta como gasto.
+          note: dueDay
+            ? describePurchase({
+                purchaseDate: charge.purchaseDate,
+                closingDay,
+                dueDay,
+                number: part.number,
+                of: part.of,
+              }).text
+            : '',
         });
       }
     }

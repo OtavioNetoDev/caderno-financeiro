@@ -6,6 +6,7 @@ const Transaction = require('../models/Transaction');
 const AppError = require('../utils/AppError');
 const pick = require('../utils/pick');
 const { MONTH_RE, buildInvoice, dueMonth } = require('../services/cardService');
+const { describeInvoice } = require('../../public/js/cardNotes');
 
 const CREATE_FIELDS = ['name', 'closingDay', 'dueDay', 'creditLimit'];
 const UPDATE_FIELDS = [...CREATE_FIELDS, 'archived'];
@@ -44,7 +45,7 @@ function invoiceRecord(card, month) {
 
 async function loadInvoice(card, month, userId) {
   const charges = await CardCharge.find({ userId, cardId: card._id, deletedAt: null });
-  const invoice = buildInvoice(charges, card.closingDay, month);
+  const invoice = buildInvoice(charges, card.closingDay, month, card.dueDay);
   const saved = card.invoices.find((item) => item.month === month);
   const billed = saved && saved.billedTotal != null ? saved.billedTotal : null;
   return {
@@ -52,6 +53,7 @@ async function loadInvoice(card, month, userId) {
     closingDay: card.closingDay,
     dueDay: card.dueDay,
     dueMonth: dueMonth(month, card.closingDay, card.dueDay),
+    description: describeInvoice({ month, closingDay: card.closingDay, dueDay: card.dueDay }),
     billedTotal: billed,
     difference: billed === null ? null : billed - invoice.total,
     paid: Boolean(saved && saved.paid),
