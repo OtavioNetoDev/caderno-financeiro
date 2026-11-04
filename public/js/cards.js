@@ -133,6 +133,25 @@
     );
     const person = el('input', { type: 'text', placeholder: 'Pessoa (opcional)', maxlength: 60 });
     const error = el('p', { class: 'error', role: 'alert', hidden: true });
+    const preview = el('p', { class: 'notice full' });
+    const updatePreview = () => {
+      if (!date.value || !card.closingDay || !card.dueDay) {
+        preview.hidden = true;
+        return;
+      }
+      const parts = Math.max(1, Number(installments.value) || 1);
+      const first = window.CF.cardNotes.describePurchase({
+        purchaseDate: date.value,
+        closingDay: card.closingDay,
+        dueDay: card.dueDay,
+        of: parts,
+      });
+      preview.textContent = first.text;
+      preview.hidden = false;
+    };
+    date.addEventListener('input', updatePreview);
+    installments.addEventListener('input', updatePreview);
+    updatePreview();
 
     return el(
       'form',
@@ -172,6 +191,7 @@
       date,
       category,
       person,
+      preview,
       el('button', { class: 'btn primary full', type: 'submit' }, 'Adicionar compra'),
       error,
     );
@@ -306,6 +326,7 @@
           {},
           item.description,
           item.personName && el('div', { class: 'muted' }, item.personName),
+          item.note && el('div', { class: 'muted' }, item.note),
         ),
         el('td', {}, categoryNames.get(item.categoryId) || '—'),
         el('td', {}, item.of > 1 ? item.number + '/' + item.of : 'à vista'),
@@ -383,6 +404,7 @@
         ),
         stat('Vencimento', dueText, ''),
       ),
+      invoice.description && el('p', { class: 'notice' }, invoice.description),
       billedForm,
       payArea,
       rows.length
