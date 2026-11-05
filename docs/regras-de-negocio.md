@@ -66,6 +66,7 @@ Nomes e valores usados como exemplo são fictícios.
 - **RN37:** O valor atual estimado de um investimento faz cada aporte e resgate render juros compostos desde a sua data. A taxa usada é, nesta ordem: o ganho por dia útil informado (convertido em taxa anual), a taxa anual informada, nenhuma taxa para ações e fundos imobiliários (valem pelo custo) ou o CDI do Banco Central para os demais. Se você informar o "valor real" visto no app do banco com a data dele, esse valor vira o ponto de partida e só contam as movimentações posteriores.
 - **RN38:** Ações e fundos imobiliários mostram a cotação de mercado (guardada por 15 minutos), a variação do dia, a diferença entre a cotação e o preço médio e os proventos por mês (cotas vezes o provento por cota informado). O código na bolsa vem do campo ticker ou é deduzido do nome, como MXRF11.
 - **RN39:** A carteira agrupa por tipo (poupança e cofrinho ficam juntos) e deixa de fora investimentos arquivados e de outras pessoas. O CDI fica guardado por 6 horas; sem internet o sistema usa o último valor conhecido e, se não houver nenhum, estima pelo custo.
+- **RN40:** Na tela Investimentos, a seção "De outras pessoas" mostra, para cada pessoa, o valor aplicado, o valor atual estimado, o ganho e quanto rende por mês, com a mesma estimativa da minha carteira, e permite movimentar cada ativo. Esses valores nunca entram em "Meus investimentos", e a pessoa é informada no campo "De quem é?" ao cadastrar.
 
 ## 7. Sessão e senha
 
