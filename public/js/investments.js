@@ -653,6 +653,36 @@
     );
   }
 
+  // Investimentos de outras pessoas (sobrinho, mãe...): fora do seu total, cada pessoa com o seu.
+  function othersSection(data, redraw) {
+    const people = data.others || [];
+    if (!people.length) {
+      return null;
+    }
+    return el(
+      'section',
+      { class: 'card' },
+      el('h2', {}, 'De outras pessoas'),
+      el('p', { class: 'muted' }, 'Estes investimentos não entram nos seus totais.'),
+      ...people.map((person) =>
+        el(
+          'div',
+          { class: 'inv-person' },
+          el('h3', {}, person.personName),
+          el(
+            'div',
+            { class: 'stats' },
+            stat('Aplicado', fmt(person.applied), ''),
+            stat('Valor atual estimado', fmt(person.value), ''),
+            stat('Ganho estimado', fmt(person.gain), gainClass(person.gain)),
+            stat('Rende por mês (aprox.)', fmt(person.monthly), 'investment'),
+          ),
+          ...person.items.map((item) => itemCard(item, redraw)),
+        ),
+      ),
+    );
+  }
+
   function homeScreen(data, redraw) {
     const { total } = data;
     const cdiNote =
@@ -748,6 +778,7 @@
           showForm ? 'Cancelar' : '+ Novo investimento',
         ),
       ),
+      othersSection(data, redraw),
       showForm
         ? newForm(
             redraw,

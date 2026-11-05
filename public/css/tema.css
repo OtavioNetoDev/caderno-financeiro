@@ -297,3 +297,10 @@ select:focus {
   flex-wrap: wrap;
   gap: 0.4rem;
 }
+
+/* Investimentos de outras pessoas. */
+.inv-person {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
