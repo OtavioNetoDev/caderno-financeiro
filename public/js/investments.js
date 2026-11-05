@@ -555,7 +555,7 @@
     ];
   }
 
-  function newForm(redraw) {
+  function newForm(redraw, owners = []) {
     const name = el('input', {
       type: 'text',
       placeholder: 'Nome (ex.: CDB banco X, MXRF11)',
@@ -582,6 +582,18 @@
       inputmode: 'decimal',
       placeholder: 'Valor real hoje R$ (opcional)',
     });
+    // Investimento de outra pessoa (sobrinho, mãe...) fica fora dos seus totais.
+    const person = el('input', {
+      type: 'text',
+      maxlength: 60,
+      placeholder: 'De quem é? (vazio = meu)',
+      list: 'cf-donos',
+    });
+    const ownersList = el(
+      'datalist',
+      { id: 'cf-donos' },
+      ...owners.map((n) => el('option', { value: n })),
+    );
     const error = el('p', { class: 'error', role: 'alert', hidden: true });
     return el(
       'form',
@@ -613,6 +625,7 @@
                 dailyGain: dailyGain || 0,
                 currentValue: currentValue || 0,
                 currentValueDate: currentValue ? money.toApiDate(money.todayISO()) : null,
+                personName: person.value,
               },
             });
             showForm = false;
@@ -628,6 +641,8 @@
       rate,
       daily,
       real,
+      person,
+      ownersList,
       el(
         'p',
         { class: 'muted full' },
@@ -733,7 +748,12 @@
           showForm ? 'Cancelar' : '+ Novo investimento',
         ),
       ),
-      showForm ? newForm(redraw) : null,
+      showForm
+        ? newForm(
+            redraw,
+            (data.others || []).map((item) => item.personName),
+          )
+        : null,
     ];
   }
 
