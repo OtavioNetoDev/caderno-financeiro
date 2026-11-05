@@ -123,14 +123,16 @@ function valuation(data, { cdi = null, now = new Date() } = {}) {
 // quotes: { TICKER: { price, previousClose } } em centavos, para ações e FIIs.
 function portfolio(investments, { cdi = null, now = new Date(), quotes = {} } = {}) {
   const groups = new Map();
+  const others = new Map();
   const history = [];
   const total = { applied: 0, value: 0, gain: 0, received: 0, monthly: 0 };
 
   for (const investment of investments) {
     const data = investment.toJSON ? investment.toJSON() : investment;
-    if (data.archived || String(data.personName || '').trim()) {
+    if (data.archived) {
       continue;
     }
+    const personName = String(data.personName || '').trim();
     const current = position(data.entries || [], now);
     const market = MARKET_TYPES.includes(data.type)
       ? marketInfo(data, current, quotes[tickerOf(data)])
@@ -147,12 +149,7 @@ function portfolio(investments, { cdi = null, now = new Date(), quotes = {} } = 
     if (market && market.incomePerShare > 0) {
       monthly = market.monthlyIncome;
     }
-    const key = GROUPS[data.type] || 'other';
-    if (!groups.has(key)) {
-      groups.set(key, { key, applied: 0, value: 0, gain: 0, received: 0, monthly: 0, items: [] });
-    }
-    const group = groups.get(key);
-    group.items.push({
+    const item = {
       id: String(data._id),
       name: data.name,
       type: data.type,
@@ -167,7 +164,33 @@ function portfolio(investments, { cdi = null, now = new Date(), quotes = {} } = 
       currentValue: Number(data.currentValue) || 0,
       share: 0,
       ...(market || { market: false }),
-    });
+    };
+    if (personName) {
+      const otherKey = personName.toLowerCase();
+      if (!others.has(otherKey)) {
+        others.set(otherKey, {
+          personName,
+          applied: 0,
+          value: 0,
+          gain: 0,
+          received: 0,
+          monthly: 0,
+          items: [],
+        });
+      }
+      const person = others.get(otherKey);
+      person.items.push(item);
+      for (const field of ['applied', 'value', 'gain', 'received', 'monthly']) {
+        person[field] += item[field];
+      }
+      continue;
+    }
+    const key = GROUPS[data.type] || 'other';
+    if (!groups.has(key)) {
+      groups.set(key, { key, applied: 0, value: 0, gain: 0, received: 0, monthly: 0, items: [] });
+    }
+    const group = groups.get(key);
+    group.items.push(item);
     for (const target of [group, total]) {
       target.applied += current.balance;
       target.value += result.value;
@@ -199,7 +222,11 @@ function portfolio(investments, { cdi = null, now = new Date(), quotes = {} } = 
     }
   }
   history.sort((a, b) => new Date(b.date) - new Date(a.date));
-  return { total, groups: list, history };
+  const people = [...others.values()].sort((a, b) => b.value - a.value);
+  for (const person of people) {
+    person.items.sort((a, b) => b.value - a.value);
+  }
+  return { total, groups: list, history, others: people };
 }
 
 module.exports = { valuation, portfolio, tickerOf, MARKET_TYPES };
