@@ -405,6 +405,16 @@
         stat('Vencimento', dueText, ''),
       ),
       invoice.description && el('p', { class: 'notice' }, invoice.description),
+      invoice.byPerson && invoice.byPerson.some((person) => person.personName)
+        ? el(
+            'p',
+            { class: 'notice' },
+            'Por pessoa: ' +
+              invoice.byPerson
+                .map((person) => (person.personName || 'Eu') + ' ' + fmt(person.total))
+                .join(' · '),
+          )
+        : null,
       billedForm,
       payArea,
       rows.length

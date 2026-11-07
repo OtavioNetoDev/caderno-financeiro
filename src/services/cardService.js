@@ -76,7 +76,15 @@ function buildInvoice(charges, closingDay, month, dueDay) {
     }
   }
   items.sort((a, b) => new Date(a.purchaseDate) - new Date(b.purchaseDate));
-  return { month, items, total: items.reduce((sum, item) => sum + item.amount, 0) };
+  // Quanto da fatura é de cada pessoa ("" = compras minhas), da maior para a menor.
+  const people = new Map();
+  for (const item of items) {
+    people.set(item.personName, (people.get(item.personName) || 0) + item.amount);
+  }
+  const byPerson = [...people]
+    .map(([personName, amount]) => ({ personName, total: amount }))
+    .sort((a, b) => b.total - a.total);
+  return { month, items, total: items.reduce((sum, item) => sum + item.amount, 0), byPerson };
 }
 
 // Gasto do mês pela fatura: soma as parcelas de todas as compras que caem em `month`,
