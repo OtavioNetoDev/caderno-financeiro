@@ -1,4 +1,4 @@
-const { describePurchase } = require('../../public/js/cardNotes');
+const { describePurchase, describeInvoice } = require('../../public/js/cardNotes');
 
 const MONTH_RE = /^\d{4}-(0[1-9]|1[0-2])$/;
 const MAX_INSTALLMENTS = 48;
@@ -82,25 +82,47 @@ function buildInvoice(charges, closingDay, month, dueDay) {
 // Gasto do mês pela fatura: soma as parcelas de todas as compras que caem em `month`,
 // separadas por categoria (categoryId null = sem categoria).
 function spendingForMonth(cards, charges, month) {
-  const closingDays = new Map(cards.map((card) => [String(card._id), card.closingDay]));
+  const cardsById = new Map(cards.map((card) => [String(card._id), card]));
   const byCategory = new Map();
+  const byCard = new Map();
   let total = 0;
   for (const charge of charges) {
-    const closingDay = closingDays.get(String(charge.cardId));
-    if (!closingDay) {
+    const cardId = String(charge.cardId);
+    const card = cardsById.get(cardId);
+    if (!card || !card.closingDay) {
       continue;
     }
-    for (const part of installmentsOf(charge, closingDay)) {
+    for (const part of installmentsOf(charge, card.closingDay)) {
       if (part.month === month) {
         const key = charge.categoryId ? String(charge.categoryId) : null;
         byCategory.set(key, (byCategory.get(key) || 0) + part.amount);
+        const current = byCard.get(cardId) || { total: 0, count: 0 };
+        current.total += part.amount;
+        current.count += 1;
+        byCard.set(cardId, current);
         total += part.amount;
       }
     }
   }
+  // Uma linha por cartão: quanto da fatura do mês entrou no gasto e de qual período ela é.
+  const invoices = [...byCard]
+    .map(([cardId, data]) => {
+      const card = cardsById.get(cardId);
+      return {
+        cardId,
+        name: card.name || '',
+        total: data.total,
+        count: data.count,
+        description: card.dueDay
+          ? describeInvoice({ month, closingDay: card.closingDay, dueDay: card.dueDay })
+          : '',
+      };
+    })
+    .sort((a, b) => b.total - a.total);
   return {
     total,
     byCategory: [...byCategory].map(([categoryId, amount]) => ({ categoryId, total: amount })),
+    invoices,
   };
 }
 

@@ -146,6 +146,7 @@ async function summary(req, res) {
     expense,
     cardExpense: card.total,
     cardByCategory: card.byCategory,
+    cardInvoices: card.invoices,
     investment,
     profit: income - expense,
     investedPercent,
