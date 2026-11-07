@@ -2,6 +2,32 @@
   const CF = window.CF;
   const { el, money } = CF;
 
+  // Quais faturas de cartão formam o gasto "No cartão" do mês, com o período de cada uma.
+  function invoicesNote(summary) {
+    const invoices = summary.cardInvoices || [];
+    if (!invoices.length) {
+      return null;
+    }
+    return el(
+      'div',
+      { class: 'notice' },
+      ...invoices.map((invoice) =>
+        el(
+          'p',
+          {},
+          invoice.name +
+            ': ' +
+            money.formatMoney(invoice.total) +
+            ' (' +
+            invoice.count +
+            (invoice.count === 1 ? ' lançamento' : ' lançamentos') +
+            '). ' +
+            invoice.description,
+        ),
+      ),
+    );
+  }
+
   function analysis(summary) {
     if (summary.income === 0 && summary.expense === 0) {
       return 'Ainda não há movimentações confirmadas neste mês.';
@@ -155,6 +181,7 @@
           stat('No cartão (fatura do mês)', money.formatMoney(summary.cardExpense || 0), 'expense'),
           stat('Pendente (despesas)', money.formatMoney(pending), ''),
         ),
+        invoicesNote(summary),
         el('p', { class: 'muted' }, analysis(summary)),
         compareHost,
       ),
