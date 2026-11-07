@@ -67,6 +67,8 @@ Nomes e valores usados como exemplo são fictícios.
 - **RN38:** Ações e fundos imobiliários mostram a cotação de mercado (guardada por 15 minutos), a variação do dia, a diferença entre a cotação e o preço médio e os proventos por mês (cotas vezes o provento por cota informado). O código na bolsa vem do campo ticker ou é deduzido do nome, como MXRF11.
 - **RN39:** A carteira agrupa por tipo (poupança e cofrinho ficam juntos) e deixa de fora investimentos arquivados e de outras pessoas. O CDI fica guardado por 6 horas; sem internet o sistema usa o último valor conhecido e, se não houver nenhum, estima pelo custo.
 - **RN40:** Na tela Investimentos, a seção "De outras pessoas" mostra, para cada pessoa, o valor aplicado, o valor atual estimado, o ganho e quanto rende por mês, com a mesma estimativa da minha carteira, e permite movimentar cada ativo. Esses valores nunca entram em "Meus investimentos", e a pessoa é informada no campo "De quem é?" ao cadastrar.
+- **RN41:** O gasto "No cartão" do resumo do mês mostra, para cada cartão, a fatura que entrou nele: total, quantidade de lançamentos e período das compras. A compra até o dia do fechamento entra na fatura que fecha naquele mês; depois do fechamento, entra na do mês seguinte, e cada parcela cai um mês depois da anterior.
+- **RN42:** Cada fatura mostra quanto é de cada pessoa, pelo campo "De quem é?" da compra. Compras sem nome são minhas ("Eu"). A soma por pessoa sempre é igual ao total da fatura.
 
 ## 7. Sessão e senha
 
