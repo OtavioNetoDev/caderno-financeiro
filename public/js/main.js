@@ -144,11 +144,15 @@
       ),
     );
 
-    const content = el('div', { class: 'content' });
+    const loading = el('p', { class: 'muted' }, 'Carregando...');
+    const content = el('div', { class: 'content' }, loading);
     app.replaceChildren(
       el('div', { class: 'shell' }, sidebar, el('div', { class: 'main' }, topbar, content)),
     );
-    view.render(content, state, refresh);
+    // Erro ao montar a aba aparece na tela em vez de deixá-la vazia.
+    Promise.resolve(view.render(content, state, refresh))
+      .catch((err) => content.replaceChildren(el('p', { class: 'error' }, err.message)))
+      .finally(() => loading.remove());
   }
 
   function showError(err) {

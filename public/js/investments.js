@@ -788,21 +788,47 @@
     ];
   }
 
-  async function render(container) {
-    let data;
-    try {
-      data = await api('/investments/portfolio');
-    } catch (err) {
-      container.replaceChildren(el('p', { class: 'error' }, err.message));
-      return;
-    }
-    const redraw = () => render(container);
+  // Último resultado da carteira: a aba abre na hora com ele e atualiza em seguida.
+  let lastData = null;
+
+  function paint(container, data, redraw) {
     const group = screen ? data.groups.find((item) => item.key === screen) : null;
     if (screen && !group) {
       screen = null;
     }
     const nodes = group ? groupScreen(data, group, redraw) : homeScreen(data, redraw);
     container.replaceChildren(...nodes.filter(Boolean));
+  }
+
+  async function show(container, { stale }) {
+    const redraw = () => show(container, { stale: false });
+    if (stale && lastData) {
+      paint(container, lastData, redraw);
+    }
+    let data;
+    try {
+      data = await api('/investments/portfolio');
+    } catch (err) {
+      if (!stale || !lastData) {
+        container.replaceChildren(el('p', { class: 'error' }, err.message));
+      }
+      return;
+    }
+    const previous = lastData;
+    lastData = data;
+    // A pessoa pode ter trocado de aba enquanto os dados vinham.
+    if (!container.isConnected) {
+      return;
+    }
+    // Nada mudou desde o que já está na tela: não redesenha, para não piscar.
+    if (stale && previous && JSON.stringify(previous) === JSON.stringify(data)) {
+      return;
+    }
+    paint(container, data, redraw);
+  }
+
+  function render(container) {
+    return show(container, { stale: true });
   }
 
   (window.CF.views = window.CF.views || {}).investments = {
