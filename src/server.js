@@ -1,5 +1,6 @@
 require('dotenv').config();
 const app = require('./app');
+const { getCdi } = require('./services/ratesService');
 const { connectDatabase } = require('./config/database');
 
 const PORT = process.env.PORT || 3000;
@@ -12,6 +13,8 @@ async function start() {
     await connectDatabase(process.env.MONGODB_URI);
     app.listen(PORT, () => {
       console.log(`Caderno Financeiro rodando na porta ${PORT}`);
+      // Esquenta o CDI para a primeira abertura de Investimentos não esperar a internet.
+      getCdi();
     });
   } catch (err) {
     console.error('Falha ao iniciar:', err.message);

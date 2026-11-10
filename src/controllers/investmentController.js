@@ -10,6 +10,9 @@ const {
 const { getQuotes } = require('../services/quotesService');
 const { getCdi } = require('../services/ratesService');
 
+// Cotações e CDI vêm da internet: a tela espera no máximo isso por elas.
+const EXTERNAL_WAIT_MS = 2500;
+
 const CREATE_FIELDS = [
   'name',
   'type',
@@ -129,12 +132,16 @@ async function income(req, res) {
 // Carteira por tipo: totais, valor atual estimado (CDI do Banco Central) e histórico.
 async function portfolio(req, res) {
   const investments = await Investment.find({ userId: req.userId, deletedAt: null });
-  const rates = await getCdi();
   const tickers = investments
     .filter((item) => MARKET_TYPES.includes(item.type) && !item.archived && !item.personName)
     .map((item) => tickerOf(item))
     .filter(Boolean);
-  const quotes = await getQuotes(tickers);
+  // CDI e cotações vêm da internet: buscam juntos e a tela espera no máximo o prazo.
+  // O que não chegar a tempo fica guardado para a próxima abertura.
+  const [rates, quotes] = await Promise.all([
+    getCdi({ waitMs: EXTERNAL_WAIT_MS }),
+    getQuotes(tickers, { waitMs: EXTERNAL_WAIT_MS }),
+  ]);
   res.json({ ...buildPortfolio(investments, { cdi: rates.annual, quotes }), cdi: rates });
 }
 
