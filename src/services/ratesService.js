@@ -1,7 +1,7 @@
 const withDeadline = require('../utils/deadline');
 
 // Taxas públicas do Banco Central (SGS 4389 = CDI anualizado, % a.a.). Sem chave e sem custo.
-const CDI_URL = 'https://api.bcb.gov.br/dados/serie/bcdata.sgs.4389/dados/ultimos/1?formato=json'\;
+const CDI_URL = 'https://api.bcb.gov.br/dados/serie/bcdata.sgs.4389/dados/ultimos/1?formato=json';
 const CACHE_MS = 6 * 60 * 60 * 1000;
 // Depois de uma falha, não tenta de novo por um tempo: assim a tela não espera a internet a cada abertura.
 const RETRY_MS = 2 * 60 * 1000;
