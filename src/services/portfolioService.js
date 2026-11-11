@@ -76,6 +76,11 @@ function valuationRate(data, cdi) {
   if (annualRate > 0) {
     return { rate: annualRate, source: 'rate' };
   }
+  // Percentual do CDI (ex.: 85 = 85% do CDI do dia).
+  const cdiPercent = Number(data.cdiPercent) || 0;
+  if (cdiPercent > 0 && cdi) {
+    return { rate: (cdi * cdiPercent) / 100, source: 'cdipct' };
+  }
   if (MARKET_TYPES.includes(data.type)) {
     return { rate: 0, source: 'cost' };
   }
@@ -162,6 +167,9 @@ function portfolio(investments, { cdi = null, now = new Date(), quotes = {} } = 
       rate: result.rate,
       source: result.source,
       currentValue: Number(data.currentValue) || 0,
+      annualRate: Number(data.annualRate) || 0,
+      dailyGain: Number(data.dailyGain) || 0,
+      cdiPercent: Number(data.cdiPercent) || 0,
       share: 0,
       ...(market || { market: false }),
     };

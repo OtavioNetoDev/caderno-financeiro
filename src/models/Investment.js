@@ -36,6 +36,13 @@ const investmentSchema = new Schema(
       max: [1000, 'Taxa alta demais'],
       default: 0,
     },
+    // Quanto rende em % do CDI (85 = 85% do CDI). 0 = não informado.
+    cdiPercent: {
+      type: Number,
+      min: [0, 'O percentual do CDI não pode ser negativo'],
+      max: [1000, 'Percentual do CDI alto demais'],
+      default: 0,
+    },
     notes: { type: String, trim: true, maxlength: 300, default: '' },
     // Vazio = investimento meu. Preenchido = de outra pessoa (sobrinho, mãe...), fora da minha carteira.
     personName: {
