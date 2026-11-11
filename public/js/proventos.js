@@ -3,6 +3,56 @@
   const { el, api, money } = CF;
   const fmt = money.formatMoney;
 
+  // Ações e FIIs pagam proventos; poupança, CDB, Tesouro e caixinhas pagam rendimentos.
+  const MARKET = ['stock', 'fii'];
+  const WORDS = {
+    market: {
+      storage: 'proventos',
+      title: 'Proventos recebidos',
+      intro:
+        'Dividendos, JCP e rendimentos que ações e fundos imobiliários pagam. Fica separado das receitas e não entra no lucro do mês. Poupança, CDB e Tesouro ficam na aba Rendimentos.',
+      formTitle: 'Registrar provento',
+      noInvestments:
+        'Cadastre uma ação ou um fundo imobiliário na tela Investimentos para poder registrar proventos.',
+      showQuantity: true,
+      removeConfirm: 'Remover este provento?',
+      listTitle: 'Proventos do mês',
+      emptyMonth: 'Nenhum provento registrado neste mês.',
+      seriesName: 'Proventos',
+      chartMonth: 'Proventos por investimento (mês)',
+      ariaMonth: 'Proventos por investimento no mês',
+      emptyMonthChart: 'Nenhum provento neste mês.',
+      chartEvolution: 'Proventos por mês (12 meses)',
+      ariaEvolution: 'Proventos recebidos por mês nos últimos 12 meses',
+      emptyYear: 'Nenhum provento nos últimos 12 meses.',
+      chartYear: 'Proventos por investimento (12 meses)',
+      ariaYear: 'Proventos por investimento nos últimos 12 meses',
+    },
+    fixed: {
+      storage: 'rendimentos',
+      title: 'Rendimentos recebidos',
+      intro:
+        'O que poupança, CDB, Tesouro e caixinhas rendem e é creditado para você. Registre aqui o valor creditado. Fica separado das receitas e não entra no lucro do mês. Ações e fundos imobiliários ficam na aba Proventos.',
+      formTitle: 'Registrar rendimento',
+      noInvestments:
+        'Cadastre uma poupança, CDB, Tesouro ou caixinha na tela Investimentos para poder registrar rendimentos.',
+      showQuantity: false,
+      removeConfirm: 'Remover este rendimento?',
+      listTitle: 'Rendimentos do mês',
+      emptyMonth: 'Nenhum rendimento registrado neste mês.',
+      seriesName: 'Rendimentos',
+      chartMonth: 'Rendimentos por investimento (mês)',
+      ariaMonth: 'Rendimentos por investimento no mês',
+      emptyMonthChart: 'Nenhum rendimento neste mês.',
+      chartEvolution: 'Rendimentos por mês (12 meses)',
+      ariaEvolution: 'Rendimentos recebidos por mês nos últimos 12 meses',
+      emptyYear: 'Nenhum rendimento nos últimos 12 meses.',
+      chartYear: 'Rendimentos por investimento (12 meses)',
+      ariaYear: 'Rendimentos por investimento nos últimos 12 meses',
+    },
+  };
+  let words = WORDS.market;
+
   const stat = (label, value, cls) =>
     el(
       'div',
@@ -25,19 +75,20 @@
     });
   }
 
-  const query = (range) =>
-    '?from=' + encodeURIComponent(range.from) + '&to=' + encodeURIComponent(range.to);
+  const query = (range, group) =>
+    '?from=' +
+    encodeURIComponent(range.from) +
+    '&to=' +
+    encodeURIComponent(range.to) +
+    '&group=' +
+    group;
 
   function summaryCard(monthReport, yearReport) {
     return el(
       'section',
       { class: 'card stack' },
-      el('h2', {}, 'Proventos recebidos'),
-      el(
-        'p',
-        { class: 'muted' },
-        'Dinheiro que os investimentos pagam (dividendos, juros, rendimentos). Fica separado das receitas e não entra no lucro do mês.',
-      ),
+      el('h2', {}, words.title),
+      el('p', { class: 'muted' }, words.intro),
       el(
         'div',
         { class: 'stats' },
@@ -55,12 +106,8 @@
       return el(
         'section',
         { class: 'card stack' },
-        el('h2', {}, 'Registrar provento'),
-        el(
-          'p',
-          { class: 'muted' },
-          'Cadastre um investimento na tela Investimentos para poder registrar proventos.',
-        ),
+        el('h2', {}, words.formTitle),
+        el('p', { class: 'muted' }, words.noInvestments),
       );
     }
     const asset = el(
@@ -128,11 +175,11 @@
           }
         },
       },
-      el('h2', {}, 'Registrar provento'),
+      el('h2', {}, words.formTitle),
       asset,
       amount,
       date,
-      quantity,
+      ...(words.showQuantity ? [quantity] : []),
       notes,
       el('button', { class: 'btn primary', type: 'submit' }, 'Registrar'),
       error,
@@ -163,7 +210,7 @@
             class: 'btn small danger',
             type: 'button',
             onclick: async () => {
-              if (confirm('Remover este provento?')) {
+              if (confirm(words.removeConfirm)) {
                 await api('/investments/' + item.investmentId + '/entries/' + item.id, {
                   method: 'DELETE',
                 });
@@ -178,17 +225,17 @@
     return el(
       'section',
       { class: 'card' },
-      el('h2', {}, 'Proventos do mês'),
+      el('h2', {}, words.listTitle),
       rows.length
         ? el('ul', { class: 'list' }, ...rows)
-        : el('p', { class: 'muted' }, 'Nenhum provento registrado neste mês.'),
+        : el('p', { class: 'muted' }, words.emptyMonth),
     );
   }
 
   // Cada gráfico tem seu seletor de tipo; a escolha fica salva neste navegador.
   function chartCard(title, key, fallbackType, spec) {
     const types = CF.analyses.ALL_TYPES;
-    const storageKey = 'cf_proventos_' + key;
+    const storageKey = 'cf_' + words.storage + '_' + key;
     let type = fallbackType;
     try {
       const saved = localStorage.getItem(storageKey);
@@ -239,23 +286,23 @@
     return el(
       'div',
       { class: 'chart-grid' },
-      chartCard('Proventos por investimento (mês)', 'mes', 'donut', {
-        ariaLabel: 'Proventos por investimento no mês',
+      chartCard(words.chartMonth, 'mes', 'donut', {
+        ariaLabel: words.ariaMonth,
         categories: monthRanking.map((item) => item.label),
-        series: [{ name: 'Proventos', values: monthRanking.map((item) => item.value) }],
-        emptyText: 'Nenhum provento neste mês.',
+        series: [{ name: words.seriesName, values: monthRanking.map((item) => item.value) }],
+        emptyText: words.emptyMonthChart,
       }),
-      chartCard('Proventos por mês (12 meses)', 'evolucao', 'bar', {
-        ariaLabel: 'Proventos recebidos por mês nos últimos 12 meses',
+      chartCard(words.chartEvolution, 'evolucao', 'bar', {
+        ariaLabel: words.ariaEvolution,
         categories: months.map(CF.analyses.monthLabel),
-        series: [{ name: 'Proventos', values: months.map((item) => totals.get(item) || 0) }],
-        emptyText: 'Nenhum provento nos últimos 12 meses.',
+        series: [{ name: words.seriesName, values: months.map((item) => totals.get(item) || 0) }],
+        emptyText: words.emptyYear,
       }),
-      chartCard('Proventos por investimento (12 meses)', 'ano', 'hbar', {
-        ariaLabel: 'Proventos por investimento nos últimos 12 meses',
+      chartCard(words.chartYear, 'ano', 'hbar', {
+        ariaLabel: words.ariaYear,
         categories: yearRanking.map((item) => item.label),
-        series: [{ name: 'Proventos', values: yearRanking.map((item) => item.value) }],
-        emptyText: 'Nenhum provento nos últimos 12 meses.',
+        series: [{ name: words.seriesName, values: yearRanking.map((item) => item.value) }],
+        emptyText: words.emptyYear,
       }),
     );
   }
@@ -332,7 +379,7 @@
     );
   }
 
-  async function render(container, state, reload) {
+  async function render(group, container, state, reload) {
     let investments;
     let monthReport;
     let yearReport;
@@ -342,16 +389,20 @@
       const yearRange = { from: money.monthRange(months[0]).from, to: monthRange.to };
       [investments, monthReport, yearReport] = await Promise.all([
         api('/investments'),
-        api('/investments/income' + query(monthRange)),
-        api('/investments/income' + query(yearRange)),
+        api('/investments/income' + query(monthRange, group)),
+        api('/investments/income' + query(yearRange, group)),
       ]);
     } catch (err) {
       container.replaceChildren(el('p', { class: 'error' }, err.message));
       return;
     }
 
+    words = WORDS[group];
     const summary = summaryCard(monthReport, yearReport);
-    const form = entryForm(investments, state, reload);
+    const ofGroup = investments.filter(
+      (item) => MARKET.includes(item.type) === (group === 'market'),
+    );
+    const form = entryForm(ofGroup, state, reload);
     const list = listCard(monthReport, reload);
     const charts = chartGrid(monthReport, yearReport, state.month);
     const returns = returnsCard(monthReport, yearReport);
@@ -360,10 +411,20 @@
     container.replaceChildren(...sections);
   }
 
-  (CF.views = CF.views || {}).proventos = {
+  const renderFor = (group) => (container, state, reload) =>
+    render(group, container, state, reload);
+
+  CF.views = CF.views || {};
+  CF.views.proventos = {
     title: 'Proventos',
     order: 45,
     monthly: true,
-    render,
+    render: renderFor('market'),
+  };
+  CF.views.rendimentos = {
+    title: 'Rendimentos',
+    order: 46,
+    monthly: true,
+    render: renderFor('fixed'),
   };
 })();
