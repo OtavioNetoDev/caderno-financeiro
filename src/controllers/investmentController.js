@@ -127,6 +127,9 @@ async function income(req, res) {
       range[key] = date;
     }
   }
+  if (['market', 'fixed'].includes(req.query.group)) {
+    range.group = req.query.group;
+  }
   const investments = await Investment.find({ userId: req.userId, deletedAt: null });
   res.json(incomeReport(investments, range));
 }

@@ -1,4 +1,4 @@
-const { position } = require('./investmentService');
+const { position, MARKET_TYPES } = require('./investmentService');
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const round1 = (value) => Math.round(value * 10) / 10;
@@ -16,8 +16,6 @@ const GROUPS = {
   other: 'other',
 };
 
-// Ações e FIIs têm cotação de mercado.
-const MARKET_TYPES = ['stock', 'fii'];
 const TICKER_ALIASES = { VALE: 'VALE3' };
 
 // Ticker informado, ou deduzido do nome (mxrf11, ggrc11, vale).

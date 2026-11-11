@@ -63,6 +63,8 @@ function applyEntry(investment, entry) {
   return null;
 }
 
+// Ações e FIIs têm cotação e pagam proventos; renda fixa e poupança pagam rendimentos.
+const MARKET_TYPES = ['stock', 'fii'];
 const VARIABLE_TYPES = ['fii', 'stock', 'fund'];
 // Dias úteis: o Tesouro e os fundos rendem só em dia útil.
 const BUSINESS_DAYS = { week: 5, month: 21, year: 252 };
@@ -176,7 +178,7 @@ const monthKey = (date) =>
 // Proventos recebidos no período (from/to opcionais). Só entram os investimentos meus;
 // o que outras pessoas (sobrinho, mãe...) receberam vai separado em "others".
 // "returns" mostra, para cada investimento meu, quanto rendeu sobre o valor investido até o fim do período.
-function incomeReport(investments, { from, to } = {}) {
+function incomeReport(investments, { from, to, group } = {}) {
   const until = to || new Date();
   const items = [];
   const returns = [];
@@ -184,6 +186,11 @@ function incomeReport(investments, { from, to } = {}) {
 
   for (const investment of investments) {
     const data = investment.toJSON ? investment.toJSON() : investment;
+    // group: "market" = ações e fundos imobiliários (proventos); "fixed" = o resto (rendimentos).
+    const isMarket = MARKET_TYPES.includes(data.type);
+    if ((group === 'market' && !isMarket) || (group === 'fixed' && isMarket)) {
+      continue;
+    }
     const entries = data.entries || [];
     const personName = String(data.personName || '').trim();
 
@@ -276,4 +283,4 @@ function incomeReport(investments, { from, to } = {}) {
   };
 }
 
-module.exports = { position, applyEntry, present, summarize, incomeReport, estimate };
+module.exports = { position, applyEntry, present, summarize, incomeReport, estimate, MARKET_TYPES };
