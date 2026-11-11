@@ -379,18 +379,124 @@
     );
   }
 
+  // De onde vem o rendimento de cada investimento (definido no botão Rendimento, em Investimentos).
+  function howItYields(item) {
+    if (item.source === 'daily') {
+      return 'ganho por dia informado';
+    }
+    if (item.source === 'cdipct') {
+      return item.cdiPercent.toLocaleString('pt-BR') + '% do CDI';
+    }
+    if (item.source === 'rate') {
+      return item.annualRate.toLocaleString('pt-BR') + '% ao ano';
+    }
+    if (item.source === 'cdi') {
+      return '100% do CDI';
+    }
+    if (item.source === 'manual') {
+      return 'a partir do valor real informado';
+    }
+    return 'sem rendimento estimado';
+  }
+
+  // Rende por dia útil: o ganho informado ou o que a taxa dá em 1/252 de ano.
+  const dailyOf = (item) =>
+    item.dailyGain > 0
+      ? item.dailyGain
+      : Math.round(item.value * (Math.pow(1 + item.rate / 100, 1 / 252) - 1));
+
+  // Quanto cada renda fixa rende por dia útil e por mês, para você conferir com o app do banco.
+  function estimateCard(portfolio) {
+    if (!portfolio) {
+      return null;
+    }
+    const items = portfolio.groups
+      .flatMap((group) => group.items)
+      .filter((item) => !MARKET.includes(item.type) && item.applied > 0);
+    const header = el(
+      'p',
+      { class: 'muted' },
+      'Estimativa, sem impostos, pelo que você definiu em Investimentos (botão Rendimento): ganho por dia útil, taxa anual ou % do CDI. Poupança, CDB, Tesouro e caixinhas entram aqui.',
+    );
+    if (!items.length) {
+      return el(
+        'section',
+        { class: 'card' },
+        el('h2', {}, 'Quanto rende'),
+        header,
+        el('p', { class: 'muted' }, 'Nenhuma renda fixa com valor aplicado ainda.'),
+      );
+    }
+    const rows = items.map((item) =>
+      el(
+        'tr',
+        {},
+        el('td', {}, item.name),
+        el('td', { class: 'num' }, fmt(item.applied)),
+        el('td', {}, howItYields(item)),
+        el('td', { class: 'num' }, fmt(dailyOf(item))),
+        el('td', { class: 'num' }, fmt(item.monthly)),
+        el('td', { class: 'num' }, fmt(item.value)),
+      ),
+    );
+    const sum = (pick) => items.reduce((total, item) => total + pick(item), 0);
+    rows.push(
+      el(
+        'tr',
+        {},
+        el('td', {}, el('strong', {}, 'Total')),
+        el('td', { class: 'num' }, el('strong', {}, fmt(sum((item) => item.applied)))),
+        el('td', {}),
+        el('td', { class: 'num' }, el('strong', {}, fmt(sum(dailyOf)))),
+        el('td', { class: 'num' }, el('strong', {}, fmt(sum((item) => item.monthly)))),
+        el('td', { class: 'num' }, el('strong', {}, fmt(sum((item) => item.value)))),
+      ),
+    );
+    return el(
+      'section',
+      { class: 'card' },
+      el('h2', {}, 'Quanto rende'),
+      header,
+      el(
+        'div',
+        { class: 'table-wrap' },
+        el(
+          'table',
+          {},
+          el(
+            'thead',
+            {},
+            el(
+              'tr',
+              {},
+              el('th', {}, 'Investimento'),
+              el('th', { class: 'num' }, 'Aplicado'),
+              el('th', {}, 'Como rende'),
+              el('th', { class: 'num' }, 'Por dia útil'),
+              el('th', { class: 'num' }, 'Por mês'),
+              el('th', { class: 'num' }, 'Valor atual'),
+            ),
+          ),
+          el('tbody', {}, ...rows),
+        ),
+      ),
+    );
+  }
+
   async function render(group, container, state, reload) {
     let investments;
     let monthReport;
     let yearReport;
+    let estimate;
     try {
       const months = lastMonths(state.month, 12);
       const monthRange = money.monthRange(state.month);
       const yearRange = { from: money.monthRange(months[0]).from, to: monthRange.to };
-      [investments, monthReport, yearReport] = await Promise.all([
+      [investments, monthReport, yearReport, estimate] = await Promise.all([
         api('/investments'),
         api('/investments/income' + query(monthRange, group)),
         api('/investments/income' + query(yearRange, group)),
+        group === 'fixed' ? api('/investments/portfolio') : null,
       ]);
     } catch (err) {
       container.replaceChildren(el('p', { class: 'error' }, err.message));
@@ -407,7 +513,9 @@
     const charts = chartGrid(monthReport, yearReport, state.month);
     const returns = returnsCard(monthReport, yearReport);
     const others = othersNote(monthReport);
-    const sections = [summary, others, form, returns, charts, list].filter(Boolean);
+    const sections = [summary, estimateCard(estimate), others, form, returns, charts, list].filter(
+      Boolean,
+    );
     container.replaceChildren(...sections);
   }
 
