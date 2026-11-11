@@ -28,6 +28,7 @@
     rate: 'estimado pela taxa',
     daily: 'estimado pelo ganho por dia',
     cost: 'a preço de custo',
+    cdipct: 'estimado pelo % do CDI',
     market: 'cotação de mercado',
   };
   const COLORS = [
@@ -422,12 +423,85 @@
     );
   }
 
+  // Como a renda fixa rende: % do CDI, taxa anual ou ganho por dia útil. Vale o primeiro preenchido
+  // nesta ordem: ganho por dia útil, taxa anual, % do CDI. Tudo vazio = 100% do CDI.
+  function rateForm(item, redraw) {
+    const percent = el('input', {
+      type: 'text',
+      inputmode: 'decimal',
+      placeholder: '% do CDI (ex.: 85)',
+      value: item.cdiPercent ? String(item.cdiPercent).replace('.', ',') : '',
+    });
+    const rate = el('input', {
+      type: 'text',
+      inputmode: 'decimal',
+      placeholder: 'Taxa anual % (opcional)',
+      value: item.annualRate ? String(item.annualRate).replace('.', ',') : '',
+    });
+    const daily = el('input', {
+      type: 'text',
+      inputmode: 'decimal',
+      placeholder: 'Ganho por dia útil R$ (opcional)',
+      value: item.dailyGain ? (item.dailyGain / 100).toFixed(2).replace('.', ',') : '',
+    });
+    const error = el('p', { class: 'error', role: 'alert', hidden: true });
+    const number = (input) => (input.value.trim() ? Number(input.value.replace(',', '.')) : 0);
+    return el(
+      'form',
+      {
+        class: 'form',
+        onsubmit: async (event) => {
+          event.preventDefault();
+          error.hidden = true;
+          const cdiPercent = number(percent);
+          const annualRate = number(rate);
+          const dailyGain = daily.value.trim() ? money.parseMoney(daily.value) : 0;
+          if (
+            !Number.isFinite(cdiPercent) ||
+            cdiPercent < 0 ||
+            !Number.isFinite(annualRate) ||
+            annualRate < 0 ||
+            dailyGain === null
+          ) {
+            error.textContent =
+              'Informe números válidos, como 85 para % do CDI ou 1,25 para o ganho por dia';
+            error.hidden = false;
+            return;
+          }
+          try {
+            await api('/investments/' + item.id, {
+              method: 'PATCH',
+              body: { cdiPercent, annualRate, dailyGain },
+            });
+            await redraw();
+          } catch (err) {
+            showError(error, err);
+          }
+        },
+      },
+      percent,
+      rate,
+      daily,
+      el('button', { class: 'btn primary', type: 'submit' }, 'Salvar rendimento'),
+      el(
+        'p',
+        { class: 'muted full' },
+        'Vale o ganho por dia útil, depois a taxa anual, depois o % do CDI. Tudo em branco = 100% do CDI. Poupança, caixinha e CDB entram aqui.',
+      ),
+      error,
+    );
+  }
+
   function itemCard(item, redraw) {
     const details = [TYPES[item.type]];
     if (item.quantity > 0) {
       details.push(item.quantity.toLocaleString('pt-BR') + ' cotas');
     }
-    details.push(SOURCES[item.source]);
+    details.push(
+      item.source === 'cdipct'
+        ? 'estimado em ' + item.cdiPercent.toLocaleString('pt-BR') + '% do CDI'
+        : SOURCES[item.source],
+    );
     const toggle = (mode, label) =>
       el(
         'button',
@@ -447,7 +521,9 @@
           ? entryForm(item, redraw)
           : open.mode === 'quote'
             ? quoteForm(item, redraw)
-            : valueForm(item, redraw)
+            : open.mode === 'rate'
+              ? rateForm(item, redraw)
+              : valueForm(item, redraw)
         : null;
 
     return el(
@@ -476,6 +552,7 @@
         { class: 'actions' },
         toggle('entry', 'Movimentar'),
         ...(item.market ? [toggle('quote', 'Cotação e proventos')] : []),
+        ...(item.market ? [] : [toggle('rate', 'Rendimento')]),
         toggle('value', 'Valor real'),
         el(
           'button',
@@ -572,6 +649,11 @@
       inputmode: 'decimal',
       placeholder: 'Taxa anual % (opcional)',
     });
+    const cdi = el('input', {
+      type: 'text',
+      inputmode: 'decimal',
+      placeholder: '% do CDI, ex.: 85 (opcional)',
+    });
     const daily = el('input', {
       type: 'text',
       inputmode: 'decimal',
@@ -608,6 +690,12 @@
             error.hidden = false;
             return;
           }
+          const cdiPercent = cdi.value.trim() ? Number(cdi.value.replace(',', '.')) : 0;
+          if (!Number.isFinite(cdiPercent) || cdiPercent < 0) {
+            error.textContent = 'Informe o % do CDI como número, por exemplo 85 ou 100';
+            error.hidden = false;
+            return;
+          }
           const dailyGain = daily.value.trim() ? money.parseMoney(daily.value) : 0;
           const currentValue = real.value.trim() ? money.parseMoney(real.value) : 0;
           if (dailyGain === null || currentValue === null) {
@@ -622,6 +710,7 @@
                 name: name.value,
                 type: type.value,
                 annualRate,
+                cdiPercent,
                 dailyGain: dailyGain || 0,
                 currentValue: currentValue || 0,
                 currentValueDate: currentValue ? money.toApiDate(money.todayISO()) : null,
@@ -639,6 +728,7 @@
       name,
       type,
       rate,
+      cdi,
       daily,
       real,
       person,
