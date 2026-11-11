@@ -55,7 +55,8 @@ Para usar em outro computador: `git clone`, `npm install`, criar o `.env` com a 
   (as compras entram no resumo e nas metas por categoria; o pagamento da fatura não conta duas vezes). Cada compra e cada fatura explicam quando foi feita, quando vence e em qual mês conta como gasto, e a fatura mostra o total de cada pessoa.
 - **Dívidas:** valores a receber e a pagar, com pagamentos, aumentos e histórico.
 - **Investimentos:** aportes, resgates e proventos, com rendimento estimado por dia, semana e mês. A carteira é agrupada por tipo, com valor atual estimado (CDI do Banco Central), cotação de ações e fundos imobiliários, preço médio e proventos por mês. Investimentos de outras pessoas (sobrinho, mãe...) ficam em uma seção própria, com total por pessoa e fora dos seus totais.
-- **Proventos:** tela própria para anotar o que os investimentos pagam (dividendos, juros, rendimentos), com resumo do mês e dos últimos 12 meses, lista, cadastro rápido, retorno sobre o valor investido (no mês e em 12 meses) e 3 gráficos de tipo à escolha. Ficam separados das receitas.
+- **Rendimentos:** tela própria para poupança, CDB, Tesouro e caixinhas, com o quadro "Quanto rende" (por dia útil e por mês), registro do valor creditado e o rendimento de cada investimento definido por ganho por dia útil, taxa anual ou % do CDI.
+- **Proventos:** tela própria para anotar o que ações e fundos imobiliários pagam (dividendos e JCP), com resumo do mês e dos últimos 12 meses, lista, cadastro rápido, retorno sobre o valor investido (no mês e em 12 meses) e 3 gráficos de tipo à escolha. Ficam separados das receitas.
 - **Simulador:** projeção de 1 a 100 anos com juros compostos e aportes mensais.
 - **Metas:** limite mensal por categoria, com alertas.
 - **Notas:** observações por mês.

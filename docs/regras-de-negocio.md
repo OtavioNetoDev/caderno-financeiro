@@ -69,6 +69,8 @@ Nomes e valores usados como exemplo são fictícios.
 - **RN40:** Na tela Investimentos, a seção "De outras pessoas" mostra, para cada pessoa, o valor aplicado, o valor atual estimado, o ganho e quanto rende por mês, com a mesma estimativa da minha carteira, e permite movimentar cada ativo. Esses valores nunca entram em "Meus investimentos", e a pessoa é informada no campo "De quem é?" ao cadastrar.
 - **RN41:** O gasto "No cartão" do resumo do mês mostra, para cada cartão, a fatura que entrou nele: total, quantidade de lançamentos e período das compras. A compra até o dia do fechamento entra na fatura que fecha naquele mês; depois do fechamento, entra na do mês seguinte, e cada parcela cai um mês depois da anterior.
 - **RN42:** Cada fatura mostra quanto é de cada pessoa, pelo campo "De quem é?" da compra. Compras sem nome são minhas ("Eu"). A soma por pessoa sempre é igual ao total da fatura.
+- **RN43:** Proventos (aba Proventos) são os pagamentos de ações e fundos imobiliários; rendimentos (aba Rendimentos) são o que poupança, CDB, Tesouro, fundos e caixinhas creditam. Os dois ficam fora das receitas e do lucro do mês, cada um com resumo, retorno sobre o valor investido e gráficos próprios.
+- **RN44:** Em cada renda fixa o rendimento pode ser definido, no botão Rendimento, por ganho por dia útil, taxa anual ou porcentagem do CDI, nessa ordem de prioridade; sem nada informado vale 100% do CDI. O quadro "Quanto rende" mostra o valor por dia útil (1/252 de ano, ou o ganho informado), por mês e o valor atual estimado.
 
 ## 7. Sessão e senha
 
