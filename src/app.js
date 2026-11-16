@@ -18,6 +18,7 @@ const importRoutes = require('./routes/imports');
 const reportRoutes = require('./routes/reports');
 const recurringRoutes = require('./routes/recurring');
 const authenticate = require('./middlewares/authenticate');
+const { apiLimiter, heavyLimiter } = require('./middlewares/rateLimiters');
 const { notFound, errorHandler } = require('./middlewares/errorHandler');
 
 const app = express();
@@ -42,6 +43,26 @@ app.use(
 );
 app.use(cors({ origin: allowedOrigins }));
 app.use(express.json({ limit: '1mb' }));
+
+// Limites por IP: geral para a API e mais apertado nas rotas que processam arquivos.
+// Os arquivos estáticos da interface ficam de fora, pois cada página carrega dezenas deles.
+const apiPaths = [
+  '/categories',
+  '/accounts',
+  '/transactions',
+  '/debts',
+  '/investments',
+  '/notes',
+  '/cards',
+  '/budgets',
+  '/export',
+  '/restore',
+  '/imports',
+  '/reports',
+  '/recurring',
+];
+app.use(apiPaths, apiLimiter);
+app.use(['/imports/preview', '/restore'], heavyLimiter);
 
 app.use('/health', healthRoutes);
 app.use('/auth', authRoutes);
