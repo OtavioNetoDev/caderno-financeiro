@@ -128,3 +128,17 @@ Endpoints: `GET /imports/formats`, `POST /imports/preview` (multipart), `POST /i
 - [ ] Hospedagem com HTTPS e backup automático
 - [ ] Cofrinhos com cota própria e regras de categorização editáveis
 - [ ] Leitura de PDF escaneado (OCR)
+
+## Backup do banco
+
+O plano gratuito do MongoDB Atlas (M0) não faz backup automático. O projeto traz um script com `mongodump`:
+
+```bash
+npm run backup
+```
+
+- Gera `backups/AAAA-MM-DD_HHMM/banco.archive.gz` e mantém os últimos 14 (`BACKUP_KEEP` muda esse número).
+- Precisa do [MongoDB Database Tools](https://www.mongodb.com/docs/database-tools/installation/installation/) instalado.
+- A pasta `backups/` está no `.gitignore`: não suba dados financeiros para o GitHub. Se copiar para a nuvem, criptografe antes.
+- Para restaurar em um banco de teste: `mongorestore --uri="URI_DE_TESTE" --gzip --archive=backups/PASTA/banco.archive.gz`
+- Além disso, cada usuário pode baixar o próprio backup em JSON pela aba Exportar e restaurá-lo com prévia.
