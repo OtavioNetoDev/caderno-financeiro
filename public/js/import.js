@@ -337,7 +337,7 @@
     const file = el('input', { type: 'file', accept: formats.join(','), required: true });
     const people = el('input', {
       type: 'text',
-      placeholder: 'Nomes para reconhecer, separados por vírgula (ex.: Raisa)',
+      placeholder: 'Nomes para reconhecer, separados por vírgula (ex.: mãe, namorada)',
       maxlength: 200,
     });
     const uploadError = el('p', { class: 'error', role: 'alert', hidden: true });

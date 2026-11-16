@@ -67,7 +67,7 @@
     share.value = start.shareMode || '';
     const person = el('input', {
       type: 'text',
-      placeholder: 'Pessoa (ex.: Raisa)',
+      placeholder: 'Pessoa (ex.: mãe, namorada)',
       maxlength: 60,
       value: start.personName || null,
     });
