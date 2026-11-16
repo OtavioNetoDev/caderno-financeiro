@@ -22,6 +22,10 @@ const { notFound, errorHandler } = require('./middlewares/errorHandler');
 
 const app = express();
 
+// Atrás de proxy (hospedagem), usa o IP real do cliente nos limites de requisição.
+// Em produção defina TRUST_PROXY=1; localmente o padrão (0) não confia em cabeçalhos de proxy.
+app.set('trust proxy', Number(process.env.TRUST_PROXY) || 0);
+
 // CORS fechado por padrão; libere origens com CORS_ORIGIN=http://localhost:5173,https://meu-site.com
 const allowedOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : false;
 
