@@ -13,7 +13,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "seed": "node src/seeds/run.js",
-    "backfill:invoices": "node src/seeds/backfillInvoicePayments.js"
+    "backfill:invoices": "node src/seeds/backfillInvoicePayments.js",
+    "backup": "bash scripts/backup.sh"
   },
   "repository": {
     "type": "git",
