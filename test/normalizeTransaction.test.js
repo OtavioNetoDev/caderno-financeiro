@@ -10,7 +10,7 @@ test('campos opcionais vazios viram ausentes', () => {
 });
 
 test('mantém valores preenchidos e remove espaços do nome da pessoa', () => {
-  const data = normalizeTransaction({ shareMode: 'with', personName: '  Raisa  ' });
+  const data = normalizeTransaction({ shareMode: 'with', personName: '  Ana  ' });
   assert.strictEqual(data.shareMode, 'with');
-  assert.strictEqual(data.personName, 'Raisa');
+  assert.strictEqual(data.personName, 'Ana');
 });

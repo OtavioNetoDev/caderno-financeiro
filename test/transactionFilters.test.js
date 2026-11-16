@@ -40,7 +40,7 @@ const items = [
     categoryId: 'c2',
     accountId: 'a2',
     description: 'Cinema',
-    personName: 'Raisa',
+    personName: 'Ana',
     notes: 'ingresso dobrado',
   },
   {
@@ -96,7 +96,7 @@ test('busca por texto ignora acento e caixa', () => {
 
 test('busca olha descrição, observação, pessoa, categoria e contas', () => {
   assert.deepStrictEqual(run({ text: 'ingresso' }), ['3']);
-  assert.deepStrictEqual(run({ text: 'raisa' }), ['3']);
+  assert.deepStrictEqual(run({ text: 'ana' }), ['3']);
   assert.deepStrictEqual(run({ text: 'mercado' }), ['1']);
   assert.deepStrictEqual(run({ text: 'carteira' }), ['3', '4']);
 });

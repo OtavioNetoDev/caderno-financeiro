@@ -7,7 +7,7 @@ Sistema financeiro individual, utilizável também por outras pessoas, para uso 
 ### Lançamentos
 
 - **RF01:** Cadastrar receita, despesa, transferência e investimento (data, valor, descrição, categoria, forma de pagamento).
-- **RF02:** Entrada rápida em texto livre, como "lanche com raisa 17" ou "açaí 12", com sugestão de categoria.
+- **RF02:** Entrada rápida em texto livre, como "lanche com a mãe 17" ou "açaí 12", com sugestão de categoria.
 - **RF03:** Importar lançamentos de documentos (txt, csv, xlsx, docx, pdf, ofx e imagem), com tela de revisão antes de salvar (ver seção "Importador de documentos").
 - **RF04:** Editar, excluir e duplicar lançamentos.
 - **RF05:** Marcar o lançamento como "pendente" (gasto que ainda será cobrado) ou "confirmado".
@@ -15,7 +15,7 @@ Sistema financeiro individual, utilizável também por outras pessoas, para uso 
 ### Categorias e tags
 
 - **RF06:** Categorias padrão (Alimentação/Lanche, Mercado, Educação, Equipamentos de trabalho, Saúde, Jogos, Transporte, Casa, Lazer, Assinaturas, Presentes, Outros), com criação de novas.
-- **RF07:** Tag "pessoa" (ex.: Raisa) e tipo de gasto **"com"** (dividido) ou **"de"** (só para a pessoa), para filtrar quanto foi gasto com ela.
+- **RF07:** Tag "pessoa" (ex.: mãe, namorada) e tipo de gasto **"com"** (dividido) ou **"de"** (só para a pessoa), para filtrar quanto foi gasto com ela.
 - **RF08:** Regras automáticas, por exemplo: a palavra "açaí" vira Alimentação.
 
 ### Contas e cartão
