@@ -20,6 +20,7 @@ Nomes e valores usados como exemplo são fictícios.
 - **RN10:** A dívida é considerada quitada quando o saldo chega a zero e permanece no histórico.
 - **RN11:** Dívidas entre as mesmas pessoas em sentidos opostos podem ser compensadas (encontro de contas), com a compensação registrada.
 - **RN12:** Em rateios (ex.: assinatura compartilhada), o valor cobrado pode ser menor que o devido, e o desconto concedido deve ser registrado.
+- **RN45:** Assinatura compartilhada paga no cartão: a compra entra inteira na fatura, para a fatura bater com o banco, e a parte de cada pessoa é registrada como dívida a receber. O custo real do usuário é o valor da compra menos o que for recebido (ver `docs/guia-assinatura-dividida.md`).
 
 ## 3. Cofrinhos, investimentos e dinheiro de terceiros
 
