@@ -27,6 +27,10 @@ Preencha o `.env` (ele nunca é versionado) e abra `http://localhost:3000`.
 | `BCRYPT_ROUNDS`       | Custo do hash de senha (padrão 12)                                               |
 | `CORS_ORIGIN`         | Origens liberadas no CORS, separadas por vírgula (opcional)                      |
 | `AUTH_RATE_LIMIT`     | Tentativas de login por IP a cada 15 minutos (padrão 20)                         |
+| `API_RATE_LIMIT`      | Requisições gerais por IP a cada 15 minutos (padrão 1000)                        |
+| `HEAVY_RATE_LIMIT`    | Importações e restaurações por IP a cada 15 minutos (padrão 30)                  |
+| `TRUST_PROXY`         | Use `1` atrás de proxy/hospedagem, para os limites enxergarem o IP real          |
+| `BACKUP_KEEP`         | Quantos backups do `npm run backup` manter (padrão 14)                           |
 | `APP_URL`             | Endereço público, usado no link de recuperação de senha                          |
 | `SMTP_*`, `MAIL_FROM` | E-mail de recuperação (opcional; sem SMTP o link aparece no console do servidor) |
 
