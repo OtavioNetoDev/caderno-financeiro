@@ -6,7 +6,7 @@
 - Tokens JWT (HS256) com validade de 12 horas, guardados só na aba do navegador e encerrados após 15 minutos sem uso.
 - Recuperação de senha com código aleatório de 32 bytes, guardado como hash SHA-256, válido por 30 minutos e de uso único. Trocar a senha encerra as sessões anteriores.
 - Todas as consultas filtram pelo usuário logado, e os campos aceitos em cada requisição são uma lista fixa.
-- Cadastro, login e recuperação têm limite de tentativas por IP.
+- Cadastro, login e recuperação têm limite de tentativas por IP. A API em geral tem um limite folgado, e importação e restauração (que gastam mais processamento) têm um limite mais apertado.
 - Cabeçalhos de segurança com `helmet`, CORS fechado por padrão e tamanho do corpo das requisições limitado.
 - A exportação em CSV neutraliza células que começam com `=`, `+`, `-` ou `@` (injeção de fórmulas).
 - Dados financeiros ficam no banco, nunca no repositório (`.env`, `data/`, `backups/` e `*.txt` estão no `.gitignore`).
@@ -21,6 +21,8 @@
 
 ## Para uso em produção
 
+- Atrás de proxy ou hospedagem (Render, Railway...), defina `TRUST_PROXY=1`. Sem isso, todos os usuários aparecem com o mesmo IP e os limites de tentativas não funcionam direito.
+- Faça backups com `npm run backup` e teste a restauração em um banco de teste. O plano gratuito do Atlas não faz backup automático.
 - Use HTTPS, um `JWT_SECRET` longo e aleatório e restrinja os IPs no MongoDB Atlas (evite `0.0.0.0/0`).
 - Configure `APP_URL` e o SMTP para a recuperação de senha.
 - Mantenha as dependências atualizadas (`npm audit`) e revise os avisos antes de aplicar correções automáticas.
